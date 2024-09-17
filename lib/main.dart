@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:omnisell_crm/app_config/app_config.dart';
+import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
 import 'package:omnisell_crm/presentation/lead_screen/controller/lead_controller.dart';
 import 'package:omnisell_crm/presentation/lead_screen/view/lead_screen.dart';
 import 'package:omnisell_crm/presentation/login_screen/controlller/login_controller.dart';
@@ -14,6 +15,7 @@ void main() async {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => LoginController()),
     ChangeNotifierProvider(create: (context) => LeadsController()),
+    ChangeNotifierProvider(create: (context) => LeadDetailsController()),
   ], child: MyApp(isLoggedIn: loggedIn)));
 }
 
