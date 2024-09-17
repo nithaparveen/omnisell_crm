@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:omnisell_crm/presentation/lead_screen/view/lead_screen.dart';
+import 'package:omnisell_crm/presentation/bottom_navigation_screen/view/bottom_navigation_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../app_config/app_config.dart';
@@ -29,7 +29,7 @@ class LoginController extends ChangeNotifier {
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
-                builder: (context) =>LeadScreen()),
+                builder: (context) =>BottomNavBar()),
             (route) => false);
       } else {
         AppUtils.oneTimeSnackBar("Password mismatch", context: context, bgColor: ColorTheme.red);

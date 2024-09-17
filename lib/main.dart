@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:omnisell_crm/app_config/app_config.dart';
+import 'package:omnisell_crm/presentation/bottom_navigation_screen/controller/bottom_navigation_controller.dart';
+import 'package:omnisell_crm/presentation/bottom_navigation_screen/view/bottom_navigation_screen.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
 import 'package:omnisell_crm/presentation/lead_screen/controller/lead_controller.dart';
 import 'package:omnisell_crm/presentation/lead_screen/view/lead_screen.dart';
@@ -14,6 +16,7 @@ void main() async {
   bool loggedIn = prefs.getBool(AppConfig.loggedIn) ?? false;
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => LoginController()),
+    ChangeNotifierProvider(create: (context) => BottomNavigationController()),
     ChangeNotifierProvider(create: (context) => LeadsController()),
     ChangeNotifierProvider(create: (context) => LeadDetailsController()),
   ], child: MyApp(isLoggedIn: loggedIn)));
@@ -27,7 +30,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: isLoggedIn ? const LeadScreen() : const LoginScreen(),
+      home: isLoggedIn ? const BottomNavBar() : const LoginScreen(),
     );
   }
 }
