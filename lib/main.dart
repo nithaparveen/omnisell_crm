@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:omnisell_crm/app_config/app_config.dart';
+import 'package:omnisell_crm/presentation/lead_screen/controller/lead_controller.dart';
 import 'package:omnisell_crm/presentation/lead_screen/view/lead_screen.dart';
 import 'package:omnisell_crm/presentation/login_screen/controlller/login_controller.dart';
 import 'package:omnisell_crm/presentation/login_screen/view/login_screen.dart';
@@ -11,7 +12,8 @@ void main() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool loggedIn = prefs.getBool(AppConfig.loggedIn) ?? false;
   runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(create: (context) => LoginController())
+    ChangeNotifierProvider(create: (context) => LoginController()),
+    ChangeNotifierProvider(create: (context) => LeadsController()),
   ], child: MyApp(isLoggedIn: loggedIn)));
 }
 
