@@ -50,4 +50,6 @@ class CustomIcons {
   static const IconData bell_1 = IconData(0xf3bc, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData whatsapp_square = IconData(0xf40c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData phone_alt = IconData(0xf879, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData user_circle = IconData(0xf2bd, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData phone_handset = IconData(0xe830, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

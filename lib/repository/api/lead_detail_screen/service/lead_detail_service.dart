@@ -15,4 +15,29 @@ class LeadDetailService {
       log("$e");
     }
   }
+
+  static Future<dynamic> fetchCommunicationSummary(leadId) async {
+    log("LeadDetailService -> fetchCommunicationSummary()");
+    try {
+      var decodedData = await ApiHelper.getData(
+        endPoint: "communication-log/summary?lead_id=$leadId",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+  }
+  static Future<dynamic> fetchPhoneSummary(leadId) async {
+    log("LeadDetailService -> fetchPhoneSummary()");
+    try {
+      var decodedData = await ApiHelper.getData(
+        endPoint: "phone-calls/summary?lead_id=$leadId",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+  }
 }

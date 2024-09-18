@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:omnisell_crm/app_config/app_config.dart';
 import 'package:omnisell_crm/core/constants/textstyles.dart';
@@ -40,9 +41,19 @@ class _LeadScreenState extends State<LeadScreen> {
         ),
         actions: [
           IconButton(
+            onPressed: fetchData,
+            tooltip: "Refresh",
+            icon: const Icon(
+              CupertinoIcons.refresh_circled,
+              size: 24,
+              color: Colors.black,
+            ),
+          ),
+          IconButton(
             icon: const Icon(
               Icons.logout_outlined,
               size: 20,
+              color: Colors.black,
             ),
             onPressed: () => logoutConfirmation(),
           ),
@@ -60,11 +71,12 @@ class _LeadScreenState extends State<LeadScreen> {
                 itemBuilder: (context, index) {
                   return InkWell(
                     onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LeadDetailScreen(
-                                leadId:
-                                    controller.leadsModel.data?[index].id ?? 0))),
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LeadDetailScreen(
+                            leadId: controller.leadsModel.data?[index].id ?? 0),
+                      ),
+                    ),
                     child: Card(
                       surfaceTintColor: Colors.white,
                       child: Padding(

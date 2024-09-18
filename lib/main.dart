@@ -4,7 +4,6 @@ import 'package:omnisell_crm/presentation/bottom_navigation_screen/controller/bo
 import 'package:omnisell_crm/presentation/bottom_navigation_screen/view/bottom_navigation_screen.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
 import 'package:omnisell_crm/presentation/lead_screen/controller/lead_controller.dart';
-import 'package:omnisell_crm/presentation/lead_screen/view/lead_screen.dart';
 import 'package:omnisell_crm/presentation/login_screen/controlller/login_controller.dart';
 import 'package:omnisell_crm/presentation/login_screen/view/login_screen.dart';
 import 'package:provider/provider.dart';
