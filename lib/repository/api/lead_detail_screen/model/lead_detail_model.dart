@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final leadDetailsModel = leadDetailsModelFromJson(jsonString);
-
 import 'dart:convert';
 
 LeadDetailsModel leadDetailsModelFromJson(String str) => LeadDetailsModel.fromJson(json.decode(str));
@@ -166,8 +162,8 @@ class Data {
 
 class AssignedTo {
     int? id;
-    Name? name;
-    Email? email;
+    String? name;
+    String? email;
     OfficeCountry? officeCountry;
     String? phoneNumber;
     LeadSource? role;
@@ -189,8 +185,8 @@ class AssignedTo {
 
     factory AssignedTo.fromJson(Map<String, dynamic> json) => AssignedTo(
         id: json["id"],
-        name: nameValues.map[json["name"]]!,
-        email: emailValues.map[json["email"]]!,
+        name: json["name"],
+        email: json["email"],
         officeCountry: json["office_country"] == null ? null : OfficeCountry.fromJson(json["office_country"]),
         phoneNumber: json["phone_number"],
         role: json["role"] == null ? null : LeadSource.fromJson(json["role"]),
@@ -201,8 +197,8 @@ class AssignedTo {
 
     Map<String, dynamic> toJson() => {
         "id": id,
-        "name": nameValues.reverse[name],
-        "email": emailValues.reverse[email],
+        "name": name,
+        "email": email,
         "office_country": officeCountry?.toJson(),
         "phone_number": phoneNumber,
         "role": role?.toJson(),

@@ -95,7 +95,7 @@ class _LeadScreenState extends State<LeadScreen> {
                                       style: GLTextStyles.cabinStyle(
                                           size: 13,
                                           weight: FontWeight.w400,
-                                          color: Colors.grey),
+                                          color: Colors.blueAccent),
                                     ),
                                     const SizedBox(height: 10),
                                     Text(
