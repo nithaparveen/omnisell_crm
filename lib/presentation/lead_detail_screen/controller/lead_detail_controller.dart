@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:omnisell_crm/repository/api/lead_detail_screen/model/communication_summary_model.dart';
 import 'package:omnisell_crm/repository/api/lead_detail_screen/model/phone_summary_model.dart';
+import 'package:omnisell_crm/repository/api/lead_detail_screen/model/status_list_model.dart';
 import 'package:omnisell_crm/repository/api/lead_detail_screen/service/lead_detail_service.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/utils/app_utils.dart';
@@ -11,9 +12,12 @@ class LeadDetailsController extends ChangeNotifier {
   bool isLoading = false;
   bool isCSLoading = false;
   bool isPSLoading = false;
+  bool isStatusLoading = false;
   LeadDetailsModel leadDetailModel = LeadDetailsModel();
-  CommunicationSummaryModel communicationSummaryModel = CommunicationSummaryModel();
+  CommunicationSummaryModel communicationSummaryModel =
+      CommunicationSummaryModel();
   PhoneSummaryModel phoneSummaryModel = PhoneSummaryModel();
+  StatusListModel statusListModel = StatusListModel();
 
   fetchData(leadId, context) async {
     isLoading = true;
@@ -31,6 +35,7 @@ class LeadDetailsController extends ChangeNotifier {
       notifyListeners();
     });
   }
+
   fetchCommunicationSummary(leadId, context) async {
     isCSLoading = true;
     notifyListeners();
@@ -47,6 +52,7 @@ class LeadDetailsController extends ChangeNotifier {
       notifyListeners();
     });
   }
+
   fetchPhoneSummary(leadId, context) async {
     isPSLoading = true;
     notifyListeners();
@@ -61,6 +67,35 @@ class LeadDetailsController extends ChangeNotifier {
         isPSLoading = false;
       }
       notifyListeners();
+    });
+  }
+
+  getStatusList(context) async {
+    isStatusLoading = true;
+    notifyListeners();
+    log("LeadDetailsController -> getStatusList()");
+    await LeadDetailService.getStatusList().then((value) {
+      if (value?["data"] != null) {
+        statusListModel = StatusListModel.fromJson(value!);
+        isStatusLoading = false;
+      } else {
+        AppUtils.oneTimeSnackBar("Unable to fetch Data",
+            context: context, bgColor: ColorTheme.red);
+        isStatusLoading = false;
+      }
+      notifyListeners();
+    });
+  }
+
+  changeStage(String leadId, String stageId, context) async {
+    log("LeadDetailsController -> changeStage()");
+    await LeadDetailService.changeStage(leadId, stageId).then((value) {
+      if (value["message"] == "Lead stage successfully changed.") {
+        // AppUtils.oneTimeSnackBar(value["message"], context: context,textStyle: TextStyle(fontSize: 18));
+      } else {
+        AppUtils.oneTimeSnackBar(value["message"],
+            context: context, bgColor: Colors.redAccent);
+      }
     });
   }
 }

@@ -40,4 +40,31 @@ class LeadDetailService {
       log("$e");
     }
   }
+
+  static Future<dynamic> getStatusList() async {
+    log("LeadDetailService -> getStatusList()");
+    try {
+      var decodedData = await ApiHelper.getData(
+        endPoint: "listing/stages",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+  }
+
+   static Future<dynamic> changeStage(leadId,stageId) async {
+    log("LeadDetailService -> assignchangeStageedToTapped()");
+    try {
+      var decodedData = await ApiHelper.postData(
+        endPoint: "leads/change-stage?lead_id=$leadId&stage_id=$stageId",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+  }
+
 }

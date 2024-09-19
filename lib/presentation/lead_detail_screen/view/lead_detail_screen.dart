@@ -39,6 +39,7 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.sizeOf(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -99,13 +100,28 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
                 percentageComplete: controller
                         .leadDetailModel.data?.stage?.progressPercentage ??
                     0,
-                leadStatus:
-                    '${controller.leadDetailModel.data?.stage?.description}',
+                leadStatus: controller
+                            .leadDetailModel.data?.stage?.description !=
+                        null
+                    ? '${controller.leadDetailModel.data?.stage?.description}'
+                    : "",
                 currentStage: '${controller.leadDetailModel.data?.stage?.name}',
+                leadId: "${controller.leadDetailModel.data?.id}",
               ),
-              Text("Communication Status",
-                  style: GLTextStyles.robotoStyle(
-                      size: 18, weight: FontWeight.w400)),
+              Row(
+                children: [
+                  Icon(
+                    Icons.messenger_outline_rounded,
+                    size: 18,
+                  ),
+                  SizedBox(
+                    width: size.width * .01,
+                  ),
+                  Text("Communication Status",
+                      style: GLTextStyles.robotoStyle(
+                          size: 18, weight: FontWeight.w400)),
+                ],
+              ),
               CommunicationCard(
                 emailSend:
                     "${controller.communicationSummaryModel.data?.emailSendSummary.toString()}",
@@ -116,9 +132,20 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
                 phoneOutbound:
                     "${controller.phoneSummaryModel.data?.callsOutbound.toString()}",
               ),
-              Text("Upcoming Task & Follow-ups",
-                  style: GLTextStyles.robotoStyle(
-                      size: 18, weight: FontWeight.w400)),
+              Row(
+                children: [
+                  Icon(
+                    Icons.calendar_today_outlined,
+                    size: 18,
+                  ),
+                  SizedBox(
+                    width: size.width * .01,
+                  ),
+                  Text("Upcoming Task & Follow-ups",
+                      style: GLTextStyles.robotoStyle(
+                          size: 18, weight: FontWeight.w400)),
+                ],
+              ),
               TaskCard(
                   latestTask:
                       controller.leadDetailModel.data?.latestTask?.dueDate !=
@@ -134,22 +161,45 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
                           .leadDetailModel.data!.latestFollowUp!.followUpDate
                           .toString())
                       : "NA"),
-              Text("Lead Source",
-                  style: GLTextStyles.robotoStyle(
-                      size: 18, weight: FontWeight.w400)),
+              Row(
+                children: [
+                  Icon(
+                    Icons.share_outlined,
+                    size: 18,
+                  ),
+                  SizedBox(
+                    width: size.width * .01,
+                  ),
+                  Text("Lead Source",
+                      style: GLTextStyles.robotoStyle(
+                          size: 18, weight: FontWeight.w400)),
+                ],
+              ),
               LeadSourceCard(
                   leadSource: controller
                               .leadDetailModel.data?.leadSource?.name !=
                           null
                       ? "${controller.leadDetailModel.data?.leadSource?.name}"
                       : "NA"),
-              Text("Assigned Salesperson",
-                  style: GLTextStyles.robotoStyle(
-                      size: 18, weight: FontWeight.w400)),
+              Row(
+                children: [
+                  Icon(
+                    Icons.person_add_outlined,
+                    size: 18,
+                  ),
+                  SizedBox(
+                    width: size.width * .01,
+                  ),
+                  Text("Assigned Salesperson",
+                      style: GLTextStyles.robotoStyle(
+                          size: 18, weight: FontWeight.w400)),
+                ],
+              ),
               AssignCard(
-                assignTo:
-                    "${controller.leadDetailModel.data?.assignedTo?.name}",
-              )
+                  assignTo: controller.leadDetailModel.data?.assignedTo?.name !=
+                          null
+                      ? "${controller.leadDetailModel.data?.assignedTo?.name}"
+                      : "NA")
             ],
           ),
         );

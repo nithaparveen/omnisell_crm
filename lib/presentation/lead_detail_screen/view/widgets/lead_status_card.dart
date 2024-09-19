@@ -1,21 +1,23 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:omnisell_crm/core/constants/textstyles.dart';
+import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:provider/provider.dart';
 
 class LeadStatusCard extends StatelessWidget {
   final int percentageComplete;
   final String leadStatus;
   final String currentStage;
+  final String leadId;
 
   const LeadStatusCard({
     super.key,
     required this.percentageComplete,
     required this.leadStatus,
     required this.currentStage,
+    required this.leadId,
   });
 
   @override
@@ -75,6 +77,7 @@ class LeadStatusCard extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 8),
+                      
                       Text(leadStatus,
                           maxLines: 2,
                           overflow: TextOverflow.visible,
@@ -83,7 +86,16 @@ class LeadStatusCard extends StatelessWidget {
                               weight: FontWeight.w600,
                               color: Colors.white)),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (context) => StatusChangeBottomSheet(
+                              leadId: leadId,
+                              currentStage: currentStage,
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF353967),
                           padding: EdgeInsets.only(left: 8, right: 8),
@@ -107,11 +119,10 @@ class LeadStatusCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: LinearProgressIndicator(
-                    borderRadius: BorderRadius.circular(5),
-                    value: progressValue,
-                    color: Colors.blue,
-                    backgroundColor: Colors.grey[300]!,
-                  ),
+                      borderRadius: BorderRadius.circular(5),
+                      value: progressValue,
+                      color: Colors.blue,
+                      backgroundColor: Colors.grey[300]!),
                 ),
               ],
             ),
@@ -148,6 +159,124 @@ class LeadStatusCard extends StatelessWidget {
               color: isActive ? Colors.white : Colors.grey[400],
             )),
       ],
+    );
+  }
+}
+
+class StatusChangeBottomSheet extends StatefulWidget {
+  final String leadId;
+  final String currentStage;
+
+  const StatusChangeBottomSheet({
+    super.key,
+    required this.leadId,
+    required this.currentStage,
+  });
+
+  @override
+  _StatusChangeBottomSheetState createState() =>
+      _StatusChangeBottomSheetState();
+}
+
+class _StatusChangeBottomSheetState extends State<StatusChangeBottomSheet> {
+  String? selectedStatus;
+  final List<Map<String, dynamic>> statuses = [
+    {"id": "7", "name": "Invalid"},
+    {"id": "6", "name": "Under Discussion"},
+    {"id": "3", "name": "Completed"},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          DropdownButtonFormField<String>(
+            padding: EdgeInsets.all(10),
+            value: selectedStatus,
+            hint: Text('Select Stage'),
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onChanged: (newValue) {
+              setState(() {
+                selectedStatus = newValue;
+              });
+            },
+            items: statuses.map((status) {
+              return DropdownMenuItem<String>(
+                value: status["name"],
+                child: Text(status["name"]),
+              );
+            }).toList(),
+          ),
+          SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey,
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () {
+                  final selectedStageId = statuses.firstWhere(
+                    (status) => status["name"] == selectedStatus,
+                    orElse: () => {"id": null},
+                  )["id"];
+
+                  if (selectedStageId != null) {
+                    Provider.of<LeadDetailsController>(context, listen: false)
+                        .changeStage(widget.leadId, selectedStageId, context);
+                  }
+
+                  Navigator.of(context).pop();
+                  setState(() {
+                    Provider.of<LeadDetailsController>(context, listen: false)
+                        .changeStage(widget.leadId, selectedStageId, context);
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF353967),
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  'Save',
+                  style: TextStyle(
+                    fontSize: 14, 
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
