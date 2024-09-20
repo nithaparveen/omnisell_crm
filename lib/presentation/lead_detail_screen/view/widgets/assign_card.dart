@@ -22,7 +22,7 @@ class AssignCard extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Text(
             assignTo,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16, // Adjust size as needed
               fontWeight: FontWeight.w500, // Adjust weight as needed
             ),

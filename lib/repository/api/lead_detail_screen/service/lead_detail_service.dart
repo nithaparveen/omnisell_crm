@@ -1,6 +1,4 @@
 import 'dart:developer';
-import 'package:flutter/foundation.dart';
-
 import '../../../../core/utils/app_utils.dart';
 import '../../../helper/api_helper.dart';
 
@@ -116,6 +114,20 @@ class LeadDetailService {
       var decodedData = await ApiHelper.postData(
         endPoint:
             "tasks/store?title=$title&due_date=$date&assigned_to_user_id=$user&lead_id=$leadId&description=$description",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+  }
+
+  static Future<dynamic> addFollowUp(leadId, date, user, note) async {
+    log("LeadDetailService -> addTask()");
+    try {
+      var decodedData = await ApiHelper.postData(
+        endPoint:
+            "follow-ups/store?lead_id=$leadId&follow_up_date=$date&assigned_to=$user&note=$note",
         header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
       );
       return decodedData;

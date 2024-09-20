@@ -166,4 +166,17 @@ class LeadDetailsController extends ChangeNotifier {
       }
     });
   }
+
+  addFollowUp(
+      String leadId, String date, String user, String note, context) async {
+    log("LeadDetailsController -> addFollowUp()");
+    await LeadDetailService.addFollowUp(leadId, date, user, note).then((value) {
+      if (value["data"] != null) {
+        // AppUtils.oneTimeSnackBar(value["message"], context: context,textStyle: TextStyle(fontSize: 18));
+      } else {
+        AppUtils.oneTimeSnackBar(value["message"],
+            context: context, bgColor: Colors.redAccent);
+      }
+    });
+  }
 }

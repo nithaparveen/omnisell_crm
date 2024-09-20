@@ -87,7 +87,8 @@ class TaskCard extends StatelessWidget {
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
-                        builder: (context) => FollowUpBottomSheet(),
+                        builder: (context) =>
+                            FollowUpBottomSheet(leadId: leadId),
                       );
                     },
                     child: Container(
@@ -328,158 +329,165 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
 }
 
 class FollowUpBottomSheet extends StatefulWidget {
+  final String leadId;
+
+  const FollowUpBottomSheet({
+    super.key,
+    required this.leadId,
+  });
   @override
   _FollowUpBottomSheetState createState() => _FollowUpBottomSheetState();
 }
 
 class _FollowUpBottomSheetState extends State<FollowUpBottomSheet> {
-  String? selectedPhoneType;
-  final List<String> phoneTypes = ['Inbound', 'Outbound'];
+  String? assignTo;
+  String? selectedUserId;
 
   final TextEditingController dateController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
 
+    @override
+  void initState() {
+    super.initState();
+    Provider.of<LeadDetailsController>(context, listen: false)
+        .getUsersList(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus();
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DropdownButtonFormField<String>(
-              value: selectedPhoneType,
-              hint: const Text('Assign To'),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onChanged: (newValue) {
-                setState(() {
-                  selectedPhoneType = newValue;
-                });
-              },
-              items: phoneTypes.map((type) {
-                return DropdownMenuItem<String>(
-                  value: type,
-                  child: Text(type),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16),
-
-            TextFormField(
-              controller: dateController,
-              readOnly: true,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                labelText: 'Followup Date',
-                suffixIcon: const Icon(Icons.calendar_today),
-              ),
-              onTap: () async {
-                DateTime? selectedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2100),
-                );
-
-                if (selectedDate != null) {
-                  TimeOfDay? selectedTime = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.now(),
-                  );
-
-                  if (selectedTime != null) {
+    return Consumer<LeadDetailsController>(builder: (context, controller, _) {
+      return GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<String>(
+                value: assignTo,
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
                     setState(() {
-                      dateController.text =
-                          "${selectedDate.toLocal()} ${selectedTime.format(context)}";
+                      assignTo = newValue;
+                      selectedUserId = controller.usersListModel.data
+                          ?.firstWhere((user) => user.name == newValue)
+                          .id
+                          ?.toString();
                     });
                   }
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-
-            TextFormField(
-              controller: noteController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                },
+                items: controller.usersListModel.data
+                        ?.map<DropdownMenuItem<String>>((user) {
+                      return DropdownMenuItem<String>(
+                        value: user.name ?? '',
+                        child: Text(user.name ?? 'Unknown'),
+                      );
+                    }).toList() ??
+                    [],
+                decoration: InputDecoration(
+                  labelText: 'Assign To',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-                labelText: 'Note',
               ),
-            ),
-            const SizedBox(height: 16),
-
-            // Action Buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Cancel button logic
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: dateController,
+                readOnly: true,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white,
-                    ),
-                  ),
+                  labelText: 'Followup Date',
+                  suffixIcon: const Icon(Icons.calendar_today),
                 ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    // Save button logic
-                    // Collect data from controllers
-                    String? dateTime = dateController.text;
-                    String? callSummary = noteController.text;
+                onTap: () async {
+                  DateTime? selectedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
 
-                    // Print or use the collected data
-                    print('Phone Type: $selectedPhoneType');
-                    print('Date and Time: $dateTime');
-                    print('Call Summary: $callSummary');
-
-                    // Close the bottom sheet
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF353967),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                  if (selectedDate != null) {
+                    setState(() {
+                      dateController.text =
+                          DateFormat('yyyy-MM-dd').format(selectedDate);
+                    });
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: noteController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text(
-                    'Save',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white,
-                    ),
-                  ),
+                  labelText: 'Note',
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      Provider.of<LeadDetailsController>(context, listen: false)
+                          .addFollowUp(
+                              widget.leadId,
+                              dateController.text,
+                              selectedUserId ?? '',
+                              noteController.text,
+                              context);
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF353967),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Save',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
