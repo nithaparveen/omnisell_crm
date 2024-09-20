@@ -22,7 +22,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true, 
+      extendBody: true,
       body: Consumer<BottomNavigationController>(
         builder: (context, provider, child) {
           return IndexedStack(
@@ -49,18 +49,18 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 title: 'Leads',
               ),
               BarItem(
-                icon: Icons.bar_chart,
-                title: 'Chart',
+                icon: Icons.dashboard_outlined,
+                title: 'Leads',
               ),
               BarItem(
-                icon: Icons.label_off_outlined,
-                title: 'Menu',
+                icon: Icons.dashboard_outlined,
+                title: 'Leads',
               ),
             ],
             activeColor: Colors.blue,
             inactiveColor: Colors.grey,
             backgroundColor: Colors.white,
-            iconSize: 18, 
+            iconSize: 18,
           );
         },
       ),
