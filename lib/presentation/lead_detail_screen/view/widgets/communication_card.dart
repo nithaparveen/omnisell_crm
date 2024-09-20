@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:omnisell_crm/core/constants/textstyles.dart';
+import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
+import 'package:provider/provider.dart';
 
 class CommunicationCard extends StatelessWidget {
   final String emailSend;
   final String emailReceiveSummary;
   final String phoneInbound;
   final String phoneOutbound;
+  final String leadId;
 
   const CommunicationCard({
     Key? key,
@@ -14,6 +17,7 @@ class CommunicationCard extends StatelessWidget {
     required this.emailReceiveSummary,
     required this.phoneInbound,
     required this.phoneOutbound,
+    required this.leadId,
   }) : super(key: key);
 
   @override
@@ -169,7 +173,9 @@ class CommunicationCard extends StatelessWidget {
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
-                        builder: (context) => CalLogBottomSheet(),
+                        builder: (context) => CalLogBottomSheet(
+                          leadId: leadId,
+                        ),
                       );
                     },
                     child: Container(
@@ -207,6 +213,12 @@ class CommunicationCard extends StatelessWidget {
 }
 
 class CalLogBottomSheet extends StatefulWidget {
+  final String leadId;
+
+  const CalLogBottomSheet({
+    super.key,
+    required this.leadId,
+  });
   @override
   _CalLogBottomSheetState createState() => _CalLogBottomSheetState();
 }
@@ -233,7 +245,7 @@ class _CalLogBottomSheetState extends State<CalLogBottomSheet> {
             // Phone Type Dropdown
             DropdownButtonFormField<String>(
               value: selectedPhoneType,
-              hint: Text('Select Type'),
+              hint: const Text('Select Type'),
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -251,7 +263,7 @@ class _CalLogBottomSheetState extends State<CalLogBottomSheet> {
                 );
               }).toList(),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Date and Time Picker
             TextFormField(
@@ -262,7 +274,7 @@ class _CalLogBottomSheetState extends State<CalLogBottomSheet> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 labelText: 'Date and Time',
-                suffixIcon: Icon(Icons.calendar_today),
+                suffixIcon: const Icon(Icons.calendar_today),
               ),
               onTap: () async {
                 DateTime? selectedDate = await showDatePicker(
@@ -279,16 +291,27 @@ class _CalLogBottomSheetState extends State<CalLogBottomSheet> {
                   );
 
                   if (selectedTime != null) {
+                    // Combine date and time into a DateTime object
+                    DateTime combinedDateTime = DateTime(
+                      selectedDate.year,
+                      selectedDate.month,
+                      selectedDate.day,
+                      selectedTime.hour,
+                      selectedTime.minute,
+                    );
+
+                    // Format the DateTime object
+                    String formattedDateTime = DateFormat('yyyy-MM-dd hh:mm:ss')
+                        .format(combinedDateTime);
+
                     setState(() {
-                      _dateTimeController.text =
-                          "${selectedDate.toLocal()} ${selectedTime.format(context)}";
+                      _dateTimeController.text = formattedDateTime;
                     });
                   }
                 }
               },
             ),
-            SizedBox(height: 16),
-
+            const SizedBox(height: 16),
             // Call Summary Field
             TextFormField(
               controller: _callSummaryController,
@@ -299,7 +322,7 @@ class _CalLogBottomSheetState extends State<CalLogBottomSheet> {
                 labelText: 'Call Summary',
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Action Buttons
             Row(
@@ -312,12 +335,12 @@ class _CalLogBottomSheetState extends State<CalLogBottomSheet> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey,
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Cancel',
                     style: TextStyle(
                       fontSize: 14,
@@ -326,30 +349,25 @@ class _CalLogBottomSheetState extends State<CalLogBottomSheet> {
                     ),
                   ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () {
-                    // Save button logic
-                    // Collect data from controllers
-                    String? dateTime = _dateTimeController.text;
-                    String? callSummary = _callSummaryController.text;
-
-                    // Print or use the collected data
-                    print('Phone Type: $selectedPhoneType');
-                    print('Date and Time: $dateTime');
-                    print('Call Summary: $callSummary');
-
-                    // Close the bottom sheet
+                    Provider.of<LeadDetailsController>(context,listen: false).addCallLog(
+                        widget.leadId,
+                        selectedPhoneType!,
+                        _dateTimeController.text,
+                        _callSummaryController.text,
+                        context);
                     Navigator.of(context).pop();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF353967),
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    backgroundColor: const Color(0xFF353967),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Save',
                     style: TextStyle(
                       fontSize: 14,

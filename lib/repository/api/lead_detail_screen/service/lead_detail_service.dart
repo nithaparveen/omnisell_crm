@@ -1,4 +1,6 @@
 import 'dart:developer';
+import 'package:flutter/foundation.dart';
+
 import '../../../../core/utils/app_utils.dart';
 import '../../../helper/api_helper.dart';
 
@@ -28,6 +30,7 @@ class LeadDetailService {
       log("$e");
     }
   }
+
   static Future<dynamic> fetchPhoneSummary(leadId) async {
     log("LeadDetailService -> fetchPhoneSummary()");
     try {
@@ -54,7 +57,7 @@ class LeadDetailService {
     }
   }
 
-   static Future<dynamic> changeStage(leadId,stageId) async {
+  static Future<dynamic> changeStage(leadId, stageId) async {
     log("LeadDetailService -> assignchangeStageedToTapped()");
     try {
       var decodedData = await ApiHelper.postData(
@@ -67,4 +70,17 @@ class LeadDetailService {
     }
   }
 
+  static Future<dynamic> addCallLog(leadId, type, dateTime, summary) async {
+    log("LeadDetailService -> assignchangeStageedToTapped()");
+    try {
+      var decodedData = await ApiHelper.postData(
+        endPoint:
+            "phone-calls/store?lead_id=$leadId&type=$type&date_time_of_call=$dateTime&call_summary=$summary",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+  }
 }

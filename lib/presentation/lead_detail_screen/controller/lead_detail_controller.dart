@@ -98,4 +98,18 @@ class LeadDetailsController extends ChangeNotifier {
       }
     });
   }
+
+  addCallLog(String leadId, String type, String dateTime, String summary,
+      context) async {
+    log("LeadDetailsController -> addCallLog()");
+    await LeadDetailService.addCallLog(leadId, type, dateTime, summary)
+        .then((value) {
+      if (value["data"] != null) {
+        // AppUtils.oneTimeSnackBar(value["message"], context: context,textStyle: TextStyle(fontSize: 18));
+      } else {
+        AppUtils.oneTimeSnackBar(value["message"],
+            context: context, bgColor: Colors.redAccent);
+      }
+    });
+  }
 }

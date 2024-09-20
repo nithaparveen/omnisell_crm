@@ -131,6 +131,7 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
                     "${controller.phoneSummaryModel.data?.callsInbound.toString()}",
                 phoneOutbound:
                     "${controller.phoneSummaryModel.data?.callsOutbound.toString()}",
+                leadId: "${controller.leadDetailModel.data?.id}",
               ),
               Row(
                 children: [
