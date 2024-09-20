@@ -57,8 +57,34 @@ class LeadDetailService {
     }
   }
 
+  static Future<dynamic> getUsersList() async {
+    log("LeadDetailService -> getUsersList()");
+    try {
+      var decodedData = await ApiHelper.getData(
+        endPoint: "listing/accessable-users",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+  }
+
+  static Future<dynamic> getLeadsList() async {
+    log("LeadDetailService -> getLeadsList()");
+    try {
+      var decodedData = await ApiHelper.getData(
+        endPoint: "listing/leads",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+  }
+
   static Future<dynamic> changeStage(leadId, stageId) async {
-    log("LeadDetailService -> assignchangeStageedToTapped()");
+    log("LeadDetailService -> changeStage()");
     try {
       var decodedData = await ApiHelper.postData(
         endPoint: "leads/change-stage?lead_id=$leadId&stage_id=$stageId",
@@ -71,11 +97,25 @@ class LeadDetailService {
   }
 
   static Future<dynamic> addCallLog(leadId, type, dateTime, summary) async {
-    log("LeadDetailService -> assignchangeStageedToTapped()");
+    log("LeadDetailService -> addCallLog()");
     try {
       var decodedData = await ApiHelper.postData(
         endPoint:
             "phone-calls/store?lead_id=$leadId&type=$type&date_time_of_call=$dateTime&call_summary=$summary",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+  }
+
+  static Future<dynamic> addTask(title, date, user, leadId, description) async {
+    log("LeadDetailService -> addTask()");
+    try {
+      var decodedData = await ApiHelper.postData(
+        endPoint:
+            "tasks/store?title=$title&due_date=$date&assigned_to_user_id=$user&lead_id=$leadId&description=$description",
         header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
       );
       return decodedData;

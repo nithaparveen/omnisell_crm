@@ -148,20 +148,21 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
                 ],
               ),
               TaskCard(
-                  latestTask:
-                      controller.leadDetailModel.data?.latestTask?.dueDate !=
-                              null
-                          ? formatDate1(controller
-                              .leadDetailModel.data!.latestTask!.dueDate
-                              .toString())
-                          : "NA",
-                  latestFollowUp: controller.leadDetailModel.data
-                              ?.latestFollowUp?.followUpDate !=
-                          null
-                      ? formatDate1(controller
-                          .leadDetailModel.data!.latestFollowUp!.followUpDate
-                          .toString())
-                      : "NA"),
+                latestTask:
+                    controller.leadDetailModel.data?.latestTask?.dueDate != null
+                        ? formatDate1(controller
+                            .leadDetailModel.data!.latestTask!.dueDate
+                            .toString())
+                        : "NA",
+                latestFollowUp: controller.leadDetailModel.data?.latestFollowUp
+                            ?.followUpDate !=
+                        null
+                    ? formatDate1(controller
+                        .leadDetailModel.data!.latestFollowUp!.followUpDate
+                        .toString())
+                    : "NA",
+                leadId: "${controller.leadDetailModel.data?.id}",
+              ),
               Row(
                 children: [
                   Icon(

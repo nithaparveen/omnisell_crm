@@ -1,16 +1,19 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:omnisell_crm/core/constants/textstyles.dart';
+import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
+import 'package:provider/provider.dart';
 
 class TaskCard extends StatelessWidget {
   final String latestTask;
   final String latestFollowUp;
+  final String leadId;
 
   const TaskCard({
     Key? key,
     required this.latestTask,
     required this.latestFollowUp,
+    required this.leadId,
   }) : super(key: key);
 
   @override
@@ -40,18 +43,20 @@ class TaskCard extends StatelessWidget {
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
-                        builder: (context) => AddTaskBottomSheet(),
+                        builder: (context) => AddTaskBottomSheet(
+                          leadId: leadId,
+                        ),
                       );
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(.2),
-                                          blurRadius: 5,
-                                          offset: const Offset(0, 8),
-                                        )
-                                      ],
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(.2),
+                              blurRadius: 5,
+                              offset: const Offset(0, 8),
+                            )
+                          ],
                           color: const Color.fromARGB(255, 229, 229, 229),
                           borderRadius: BorderRadius.circular(5)),
                       child: Padding(
@@ -78,22 +83,22 @@ class TaskCard extends StatelessWidget {
                 children: [
                   Text(latestFollowUp),
                   GestureDetector(
-                     onTap: () {
+                    onTap: () {
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
                         builder: (context) => FollowUpBottomSheet(),
                       );
-                     },
+                    },
                     child: Container(
                       decoration: BoxDecoration(
-                        boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(.2),
-                                          blurRadius: 5,
-                                          offset: const Offset(0, 8),
-                                        )
-                                      ],
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(.2),
+                              blurRadius: 5,
+                              offset: const Offset(0, 8),
+                            )
+                          ],
                           color: const Color.fromARGB(255, 229, 229, 229),
                           borderRadius: BorderRadius.circular(5)),
                       child: Padding(
@@ -120,197 +125,205 @@ class TaskCard extends StatelessWidget {
 }
 
 class AddTaskBottomSheet extends StatefulWidget {
+  final String leadId;
+
+  const AddTaskBottomSheet({
+    super.key,
+    required this.leadId,
+  });
   @override
   _AddTaskBottomSheetState createState() => _AddTaskBottomSheetState();
 }
 
 class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   String? assignTo;
-  String? leadList;
-  final List<String> phoneTypes = ['Inbound', 'Outbound'];
+  String? selectedLead;
+  String? selectedUserId;
 
-  final TextEditingController _dateTimeController = TextEditingController();
+  final TextEditingController dateController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController titileController = TextEditingController();
+  final TextEditingController assignToController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<LeadDetailsController>(context, listen: false)
+        .getUsersList(context);
+    Provider.of<LeadDetailsController>(context, listen: false)
+        .getLeadsList(context);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Dismiss keyboard when tapping outside the text fields
-        FocusScope.of(context).unfocus();
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-             TextFormField(
-              controller: titileController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+    return Consumer<LeadDetailsController>(builder: (context, controller, _) {
+      return GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: titileController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  labelText: 'Title',
                 ),
-                labelText: 'Title',
               ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Date and Time Picker
-            TextFormField(
-              controller: _dateTimeController,
-              readOnly: true,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: dateController,
+                readOnly: true,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  labelText: 'Due Date',
+                  suffixIcon: const Icon(Icons.calendar_today),
                 ),
-                labelText: 'Date and Time',
-                suffixIcon: const Icon(Icons.calendar_today),
-              ),
-              onTap: () async {
-                DateTime? selectedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2100),
-                );
-    
-                if (selectedDate != null) {
-                  TimeOfDay? selectedTime = await showTimePicker(
+                onTap: () async {
+                  DateTime? selectedDate = await showDatePicker(
                     context: context,
-                    initialTime: TimeOfDay.now(),
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
                   );
-    
-                  if (selectedTime != null) {
+
+                  if (selectedDate != null) {
                     setState(() {
-                      _dateTimeController.text =
-                          "${selectedDate.toLocal()} ${selectedTime.format(context)}";
+                      dateController.text =
+                          DateFormat('yyyy-MM-dd').format(selectedDate);
                     });
                   }
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-    
-            // Phone Type Dropdown
-            DropdownButtonFormField<String>(
-              value: assignTo,
-              hint: const Text('Assign To'),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                },
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: assignTo,
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      assignTo = newValue;
+                      selectedUserId = controller.usersListModel.data
+                          ?.firstWhere((user) => user.name == newValue)
+                          .id
+                          ?.toString();
+                    });
+                  }
+                },
+                items: controller.usersListModel.data
+                        ?.map<DropdownMenuItem<String>>((user) {
+                      return DropdownMenuItem<String>(
+                        value: user.name ?? '',
+                        child: Text(user.name ?? 'Unknown'),
+                      );
+                    }).toList() ??
+                    [],
+                decoration: InputDecoration(
+                  labelText: 'Assign To',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
-              onChanged: (newValue) {
-                setState(() {
-                  assignTo = newValue;
-                });
-              },
-              items: phoneTypes.map((type) {
-                return DropdownMenuItem<String>(
-                  value: type,
-                  child: Text(type),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16),
-             DropdownButtonFormField<String>(
-              value: assignTo,
-              hint: const Text('Lead'),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: selectedLead,
+                decoration: InputDecoration(
+                  labelText: 'Lead',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedLead = newValue;
+                  });
+                },
+                items: controller.leadsListModel.data?.data
+                        ?.map<DropdownMenuItem<String>>((lead) {
+                      return DropdownMenuItem<String>(
+                        value: lead.name ?? '',
+                        child: Text(lead.name ?? 'Unknown'),
+                      );
+                    }).toList() ??
+                    [],
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: descriptionController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  labelText: 'Description',
                 ),
               ),
-              onChanged: (newValue) {
-                setState(() {
-                  assignTo = newValue;
-                });
-              },
-              items: phoneTypes.map((type) {
-                return DropdownMenuItem<String>(
-                  value: type,
-                  child: Text(type),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16),
-    
-            // Call Summary Field
-            TextFormField(
-              controller: descriptionController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                labelText: 'Description',
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      Provider.of<LeadDetailsController>(context, listen: false)
+                          .addTask(
+                              titileController.text,
+                              dateController.text,
+                              selectedUserId ?? '',
+                              widget.leadId,
+                              descriptionController.text,
+                              context);
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF353967),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Save',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 16),
-    
-            // Action Buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Cancel button logic
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    // Save button logic
-                    // Collect data from controllers
-                    String? dateTime = _dateTimeController.text;
-                    String? callSummary = descriptionController.text;
-                    
-                    // Print or use the collected data
-                    print('Phone Type: $assignTo');
-                    print('Date and Time: $dateTime');
-                    print('Call Summary: $callSummary');
-                    
-                    // Close the bottom sheet
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF353967),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'Save',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 
@@ -330,7 +343,6 @@ class _FollowUpBottomSheetState extends State<FollowUpBottomSheet> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Dismiss keyboard when tapping outside the text fields
         FocusScope.of(context).unfocus();
       },
       child: Padding(
@@ -338,7 +350,6 @@ class _FollowUpBottomSheetState extends State<FollowUpBottomSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Phone Type Dropdown
             DropdownButtonFormField<String>(
               value: selectedPhoneType,
               hint: const Text('Assign To'),
@@ -360,7 +371,7 @@ class _FollowUpBottomSheetState extends State<FollowUpBottomSheet> {
               }).toList(),
             ),
             const SizedBox(height: 16),
-    
+
             TextFormField(
               controller: dateController,
               readOnly: true,
@@ -378,13 +389,13 @@ class _FollowUpBottomSheetState extends State<FollowUpBottomSheet> {
                   firstDate: DateTime(2000),
                   lastDate: DateTime(2100),
                 );
-    
+
                 if (selectedDate != null) {
                   TimeOfDay? selectedTime = await showTimePicker(
                     context: context,
                     initialTime: TimeOfDay.now(),
                   );
-    
+
                   if (selectedTime != null) {
                     setState(() {
                       dateController.text =
@@ -395,7 +406,7 @@ class _FollowUpBottomSheetState extends State<FollowUpBottomSheet> {
               },
             ),
             const SizedBox(height: 16),
-    
+
             TextFormField(
               controller: noteController,
               decoration: InputDecoration(
@@ -406,7 +417,7 @@ class _FollowUpBottomSheetState extends State<FollowUpBottomSheet> {
               ),
             ),
             const SizedBox(height: 16),
-    
+
             // Action Buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -439,12 +450,12 @@ class _FollowUpBottomSheetState extends State<FollowUpBottomSheet> {
                     // Collect data from controllers
                     String? dateTime = dateController.text;
                     String? callSummary = noteController.text;
-                    
+
                     // Print or use the collected data
                     print('Phone Type: $selectedPhoneType');
                     print('Date and Time: $dateTime');
                     print('Call Summary: $callSummary');
-                    
+
                     // Close the bottom sheet
                     Navigator.of(context).pop();
                   },
