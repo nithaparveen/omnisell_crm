@@ -135,4 +135,20 @@ class LeadDetailService {
       log("$e");
     }
   }
+
+  static Future<dynamic> sendMail(subject,to,cc,body,leadId) async {
+    log("LeadDetailService -> sendMail()");
+    try {
+      var decodedData = await ApiHelper.postData(
+        endPoint:
+            "emails/store?subject=$subject&to=$to&message=$body&cc=$cc&lead_id=$leadId",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+  }
+
+
 }

@@ -57,7 +57,7 @@ class TaskCard extends StatelessWidget {
                               offset: const Offset(0, 8),
                             )
                           ],
-                          color: const Color.fromARGB(255, 229, 229, 229),
+                          color: Color.fromARGB(255, 255, 255, 255),
                           borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -100,7 +100,7 @@ class TaskCard extends StatelessWidget {
                               offset: const Offset(0, 8),
                             )
                           ],
-                          color: const Color.fromARGB(255, 229, 229, 229),
+                          color: Color.fromARGB(255, 255, 255, 255),
                           borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.only(

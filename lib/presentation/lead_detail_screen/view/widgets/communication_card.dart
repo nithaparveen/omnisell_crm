@@ -1,4 +1,7 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_crm/core/constants/textstyles.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
@@ -89,26 +92,36 @@ class CommunicationCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(.2),
-                            blurRadius: 5,
-                            offset: const Offset(0, 8),
-                          )
-                        ],
-                        color: const Color.fromARGB(255, 229, 229, 229),
-                        borderRadius: BorderRadius.circular(5)),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 5, bottom: 5, right: 10, left: 10),
-                      child: Text(
-                        "Send Mail",
-                        style: GLTextStyles.openSans(
-                            color: Colors.black,
-                            size: 14,
-                            weight: FontWeight.w400),
+                  GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (context) => MailBottomSheet(
+                            leadId: leadId,
+                          ));
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(.2),
+                              blurRadius: 5,
+                              offset: const Offset(0, 8),
+                            )
+                          ],
+                          color: Color.fromARGB(255, 255, 255, 255),
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 5, bottom: 5, right: 10, left: 10),
+                        child: Text(
+                          "Send Mail",
+                          style: GLTextStyles.openSans(
+                              color: Colors.black,
+                              size: 14,
+                              weight: FontWeight.w400),
+                        ),
                       ),
                     ),
                   )
@@ -187,7 +200,7 @@ class CommunicationCard extends StatelessWidget {
                               offset: const Offset(0, 8),
                             )
                           ],
-                          color: const Color.fromARGB(255, 229, 229, 229),
+                          color: Color.fromARGB(255, 255, 255, 255),
                           borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -352,12 +365,13 @@ class _CalLogBottomSheetState extends State<CalLogBottomSheet> {
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () {
-                    Provider.of<LeadDetailsController>(context,listen: false).addCallLog(
-                        widget.leadId,
-                        selectedPhoneType!,
-                        _dateTimeController.text,
-                        _callSummaryController.text,
-                        context);
+                    Provider.of<LeadDetailsController>(context, listen: false)
+                        .addCallLog(
+                            widget.leadId,
+                            selectedPhoneType!,
+                            _dateTimeController.text,
+                            _callSummaryController.text,
+                            context);
                     Navigator.of(context).pop();
                   },
                   style: ElevatedButton.styleFrom(
@@ -380,6 +394,149 @@ class _CalLogBottomSheetState extends State<CalLogBottomSheet> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class MailBottomSheet extends StatefulWidget {
+  final String leadId;
+
+  const MailBottomSheet({
+    super.key,
+    required this.leadId,
+  });
+  @override
+  _MailBottomSheetState createState() => _MailBottomSheetState();
+}
+
+class _MailBottomSheetState extends State<MailBottomSheet> {
+  TextEditingController toController = TextEditingController();
+  TextEditingController ccController = TextEditingController();
+  TextEditingController subjectController = TextEditingController();
+  TextEditingController bodyController = TextEditingController();
+  TextEditingController bodyFooterController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    toController.text = "priyanka@spiderworks.in";
+  }
+
+  @override
+  void dispose() {
+    toController.dispose();
+    ccController.dispose();
+    subjectController.dispose();
+    bodyController.dispose();
+    bodyFooterController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          left: 10,
+          right: 10,
+          top: 10),
+      child: Wrap(
+        children: [
+          Container(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: toController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    labelText: 'To',
+                    hintText: 'Recipient Email',
+                  ),
+                  readOnly: true,
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: ccController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    labelText: 'CC',
+                  ),
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: subjectController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    labelText: 'Subject',
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text('Body'),
+                TextField(
+                  controller: bodyController,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      style: const ButtonStyle(
+                          backgroundColor:
+                              MaterialStatePropertyAll(Colors.white)),
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(
+                        'Cancel',
+                        style: GLTextStyles.cabinStyle(
+                          size: 14,
+                          color: Color(0xFF353967),
+                          weight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      style: const ButtonStyle(
+                        backgroundColor:
+                            MaterialStatePropertyAll(Color(0xFF353967)),
+                      ),
+                      onPressed: () {
+                        Provider.of<LeadDetailsController>(context,
+                                listen: false)
+                            .sendMail(
+                                subjectController.text,
+                                toController.text,
+                                ccController.text,
+                                bodyController.text,
+                                widget.leadId,
+                                context);
+                        print("Mail sent!");
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text(
+                        'Send',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

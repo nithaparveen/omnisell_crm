@@ -108,14 +108,14 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
                 children: [
                   Icon(
                     Icons.messenger_outline_rounded,
-                    size: 18,
+                    size: 16,
                   ),
                   SizedBox(
                     width: size.width * .01,
                   ),
                   Text("Communication Status",
                       style: GLTextStyles.robotoStyle(
-                          size: 18, weight: FontWeight.w400)),
+                          size: 16, weight: FontWeight.w500)),
                 ],
               ),
               CommunicationCard(
@@ -133,14 +133,14 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
                 children: [
                   Icon(
                     Icons.calendar_today_outlined,
-                    size: 18,
+                    size: 16,
                   ),
                   SizedBox(
                     width: size.width * .01,
                   ),
                   Text("Upcoming Task & Follow-ups",
                       style: GLTextStyles.robotoStyle(
-                          size: 18, weight: FontWeight.w400)),
+                          size: 16, weight: FontWeight.w500)),
                 ],
               ),
               TaskCard(
@@ -163,14 +163,14 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
                 children: [
                   Icon(
                     Icons.share_outlined,
-                    size: 18,
+                    size: 16,
                   ),
                   SizedBox(
                     width: size.width * .01,
                   ),
                   Text("Lead Source",
                       style: GLTextStyles.robotoStyle(
-                          size: 18, weight: FontWeight.w400)),
+                          size: 16, weight: FontWeight.w500)),
                 ],
               ),
               LeadSourceCard(
@@ -183,14 +183,14 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
                 children: [
                   Icon(
                     Icons.person_add_outlined,
-                    size: 18,
+                    size: 16,
                   ),
                   SizedBox(
                     width: size.width * .01,
                   ),
                   Text("Assigned Salesperson",
                       style: GLTextStyles.robotoStyle(
-                          size: 18, weight: FontWeight.w400)),
+                          size: 16, weight: FontWeight.w500)),
                 ],
               ),
               AssignCard(

@@ -179,4 +179,16 @@ class LeadDetailsController extends ChangeNotifier {
       }
     });
   }
+
+  sendMail(String subject, String to, String cc, String body,String leadId, context) async {
+    log("LeadDetailsController -> sendMail()");
+    await LeadDetailService.sendMail(subject, to, cc, body,leadId).then((value) {
+      if (value["data"] != null) {
+        // AppUtils.oneTimeSnackBar(value["message"], context: context,textStyle: TextStyle(fontSize: 18));
+      } else {
+        AppUtils.oneTimeSnackBar(value["message"],
+            context: context, bgColor: Colors.redAccent);
+      }
+    });
+  }
 }
