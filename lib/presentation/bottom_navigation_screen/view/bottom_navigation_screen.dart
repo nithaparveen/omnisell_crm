@@ -47,6 +47,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
               BarItem(
                 icon: Icons.dashboard_outlined,
                 title: 'Leads',
+                
               ),
               BarItem(
                 icon: Icons.dashboard_outlined,

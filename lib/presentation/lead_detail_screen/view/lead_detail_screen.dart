@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_crm/core/constants/textstyles.dart';
+import 'package:omnisell_crm/global_widgets/shimmer_effect.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/view/widgets/assign_card.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/view/widgets/communication_card.dart';
@@ -72,12 +73,7 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
       ),
       body: Consumer<LeadDetailsController>(builder: (context, controller, _) {
         if (controller.isLoading) {
-          return const Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.transparent,
-              color: Color.fromARGB(255, 46, 146, 157),
-            ),
-          );
+          return ShimmerEffect(size: size);
         }
         return SingleChildScrollView(
           padding: const EdgeInsets.all(10.0),
