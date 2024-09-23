@@ -10,11 +10,11 @@ class TaskCard extends StatelessWidget {
   final String leadId;
 
   const TaskCard({
-    Key? key,
+    super.key,
     required this.latestTask,
     required this.latestFollowUp,
     required this.leadId,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +41,7 @@ class TaskCard extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       showModalBottomSheet(
+                        backgroundColor: Colors.white,
                         context: context,
                         isScrollControlled: true,
                         builder: (context) => AddTaskBottomSheet(
@@ -57,7 +58,7 @@ class TaskCard extends StatelessWidget {
                               offset: const Offset(0, 8),
                             )
                           ],
-                          color: Color.fromARGB(255, 255, 255, 255),
+                          color: const Color.fromARGB(255, 255, 255, 255),
                           borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -85,6 +86,7 @@ class TaskCard extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       showModalBottomSheet(
+                        backgroundColor: Colors.white,
                         context: context,
                         isScrollControlled: true,
                         builder: (context) =>
@@ -100,7 +102,7 @@ class TaskCard extends StatelessWidget {
                               offset: const Offset(0, 8),
                             )
                           ],
-                          color: Color.fromARGB(255, 255, 255, 255),
+                          color: const Color.fromARGB(255, 255, 255, 255),
                           borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -133,10 +135,10 @@ class AddTaskBottomSheet extends StatefulWidget {
     required this.leadId,
   });
   @override
-  _AddTaskBottomSheetState createState() => _AddTaskBottomSheetState();
+  AddTaskBottomSheetState createState() => AddTaskBottomSheetState();
 }
 
-class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
+class AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   String? assignTo;
   String? selectedLead;
   String? selectedUserId;
@@ -336,17 +338,17 @@ class FollowUpBottomSheet extends StatefulWidget {
     required this.leadId,
   });
   @override
-  _FollowUpBottomSheetState createState() => _FollowUpBottomSheetState();
+  FollowUpBottomSheetState createState() => FollowUpBottomSheetState();
 }
 
-class _FollowUpBottomSheetState extends State<FollowUpBottomSheet> {
+class FollowUpBottomSheetState extends State<FollowUpBottomSheet> {
   String? assignTo;
   String? selectedUserId;
 
   final TextEditingController dateController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
 
-    @override
+  @override
   void initState() {
     super.initState();
     Provider.of<LeadDetailsController>(context, listen: false)

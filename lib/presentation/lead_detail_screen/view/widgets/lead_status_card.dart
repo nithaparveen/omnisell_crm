@@ -77,7 +77,6 @@ class LeadStatusCard extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 8),
-                      
                       Text(leadStatus,
                           maxLines: 2,
                           overflow: TextOverflow.visible,
@@ -174,11 +173,10 @@ class StatusChangeBottomSheet extends StatefulWidget {
   });
 
   @override
-  _StatusChangeBottomSheetState createState() =>
-      _StatusChangeBottomSheetState();
+  StatusChangeBottomSheetState createState() => StatusChangeBottomSheetState();
 }
 
-class _StatusChangeBottomSheetState extends State<StatusChangeBottomSheet> {
+class StatusChangeBottomSheetState extends State<StatusChangeBottomSheet> {
   String? selectedStatus;
   final List<Map<String, dynamic>> statuses = [
     {"id": "7", "name": "Invalid"},
@@ -267,7 +265,7 @@ class _StatusChangeBottomSheetState extends State<StatusChangeBottomSheet> {
                 child: Text(
                   'Save',
                   style: TextStyle(
-                    fontSize: 14, 
+                    fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: Colors.white,
                   ),

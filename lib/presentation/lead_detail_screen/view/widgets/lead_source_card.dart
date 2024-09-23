@@ -4,9 +4,9 @@ class LeadSourceCard extends StatelessWidget {
   final String leadSource;
 
   const LeadSourceCard({
-    Key? key,
+    super.key,
     required this.leadSource,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

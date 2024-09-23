@@ -136,7 +136,7 @@ class LeadDetailService {
     }
   }
 
-  static Future<dynamic> sendMail(subject,to,cc,body,leadId) async {
+  static Future<dynamic> sendMail(subject, to, cc, body, leadId) async {
     log("LeadDetailService -> sendMail()");
     try {
       var decodedData = await ApiHelper.postData(
@@ -149,6 +149,4 @@ class LeadDetailService {
       log("$e");
     }
   }
-
-
 }

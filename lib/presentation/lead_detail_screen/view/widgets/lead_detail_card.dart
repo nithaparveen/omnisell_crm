@@ -9,14 +9,13 @@ class DetailCard extends StatelessWidget {
   final String phone;
 
   const DetailCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.addedDate,
     required this.lastActive,
     required this.email,
     required this.phone,
-  }) : super(key: key);
-
+  });
 
   @override
   Widget build(BuildContext context) {

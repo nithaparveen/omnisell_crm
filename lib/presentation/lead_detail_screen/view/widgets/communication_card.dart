@@ -1,7 +1,4 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_crm/core/constants/textstyles.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
@@ -15,13 +12,13 @@ class CommunicationCard extends StatelessWidget {
   final String leadId;
 
   const CommunicationCard({
-    Key? key,
+    super.key,
     required this.emailSend,
     required this.emailReceiveSummary,
     required this.phoneInbound,
     required this.phoneOutbound,
     required this.leadId,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -95,11 +92,12 @@ class CommunicationCard extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       showModalBottomSheet(
+                          backgroundColor: Colors.white,
                           context: context,
                           isScrollControlled: true,
                           builder: (context) => MailBottomSheet(
-                            leadId: leadId,
-                          ));
+                                leadId: leadId,
+                              ));
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -110,7 +108,7 @@ class CommunicationCard extends StatelessWidget {
                               offset: const Offset(0, 8),
                             )
                           ],
-                          color: Color.fromARGB(255, 255, 255, 255),
+                          color: const Color.fromARGB(255, 255, 255, 255),
                           borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -184,6 +182,7 @@ class CommunicationCard extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       showModalBottomSheet(
+                        backgroundColor: Colors.white,
                         context: context,
                         isScrollControlled: true,
                         builder: (context) => CalLogBottomSheet(
@@ -200,7 +199,7 @@ class CommunicationCard extends StatelessWidget {
                               offset: const Offset(0, 8),
                             )
                           ],
-                          color: Color.fromARGB(255, 255, 255, 255),
+                          color: const Color.fromARGB(255, 255, 255, 255),
                           borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -233,10 +232,10 @@ class CalLogBottomSheet extends StatefulWidget {
     required this.leadId,
   });
   @override
-  _CalLogBottomSheetState createState() => _CalLogBottomSheetState();
+  CalLogBottomSheetState createState() => CalLogBottomSheetState();
 }
 
-class _CalLogBottomSheetState extends State<CalLogBottomSheet> {
+class CalLogBottomSheetState extends State<CalLogBottomSheet> {
   String? selectedPhoneType;
   final List<String> phoneTypes = ['Inbound', 'Outbound'];
 
@@ -407,10 +406,10 @@ class MailBottomSheet extends StatefulWidget {
     required this.leadId,
   });
   @override
-  _MailBottomSheetState createState() => _MailBottomSheetState();
+  MailBottomSheetState createState() => MailBottomSheetState();
 }
 
-class _MailBottomSheetState extends State<MailBottomSheet> {
+class MailBottomSheetState extends State<MailBottomSheet> {
   TextEditingController toController = TextEditingController();
   TextEditingController ccController = TextEditingController();
   TextEditingController subjectController = TextEditingController();
@@ -444,7 +443,7 @@ class _MailBottomSheetState extends State<MailBottomSheet> {
       child: Wrap(
         children: [
           Container(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -459,7 +458,7 @@ class _MailBottomSheetState extends State<MailBottomSheet> {
                   ),
                   readOnly: true,
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextField(
                   controller: ccController,
                   decoration: InputDecoration(
@@ -469,7 +468,7 @@ class _MailBottomSheetState extends State<MailBottomSheet> {
                     labelText: 'CC',
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextField(
                   controller: subjectController,
                   decoration: InputDecoration(
@@ -479,8 +478,8 @@ class _MailBottomSheetState extends State<MailBottomSheet> {
                     labelText: 'Subject',
                   ),
                 ),
-                SizedBox(height: 10),
-                Text('Body'),
+                const SizedBox(height: 10),
+                const Text('Body'),
                 TextField(
                   controller: bodyController,
                   maxLines: 4,
@@ -490,7 +489,7 @@ class _MailBottomSheetState extends State<MailBottomSheet> {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -503,7 +502,7 @@ class _MailBottomSheetState extends State<MailBottomSheet> {
                         'Cancel',
                         style: GLTextStyles.cabinStyle(
                           size: 14,
-                          color: Color(0xFF353967),
+                          color: const Color(0xFF353967),
                           weight: FontWeight.w500,
                         ),
                       ),
@@ -523,7 +522,6 @@ class _MailBottomSheetState extends State<MailBottomSheet> {
                                 bodyController.text,
                                 widget.leadId,
                                 context);
-                        print("Mail sent!");
                         Navigator.of(context).pop();
                       },
                       child: const Text(

@@ -194,10 +194,12 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
                 ],
               ),
               AssignCard(
-                  assignTo: controller.leadDetailModel.data?.assignedTo?.name !=
-                          null
-                      ? "${controller.leadDetailModel.data?.assignedTo?.name}"
-                      : "NA")
+                assignTo:
+                    controller.leadDetailModel.data?.assignedTo?.name != null
+                        ? "${controller.leadDetailModel.data?.assignedTo?.name}"
+                        : "NA",
+                leadId: "${controller.leadDetailModel.data?.id}",
+              )
             ],
           ),
         );
