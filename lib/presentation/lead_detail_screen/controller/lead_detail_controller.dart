@@ -2,7 +2,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:omnisell_crm/repository/api/lead_detail_screen/model/communication_summary_model.dart';
 import 'package:omnisell_crm/repository/api/lead_detail_screen/model/leads_list_model.dart';
+import 'package:omnisell_crm/repository/api/lead_detail_screen/model/office_list_model.dart';
 import 'package:omnisell_crm/repository/api/lead_detail_screen/model/phone_summary_model.dart';
+import 'package:omnisell_crm/repository/api/lead_detail_screen/model/sales_manager_list_model.dart';
 import 'package:omnisell_crm/repository/api/lead_detail_screen/model/status_list_model.dart';
 import 'package:omnisell_crm/repository/api/lead_detail_screen/model/users_list_model.dart';
 import 'package:omnisell_crm/repository/api/lead_detail_screen/service/lead_detail_service.dart';
@@ -17,6 +19,8 @@ class LeadDetailsController extends ChangeNotifier {
   bool isStatusLoading = false;
   bool isUsersLoading = false;
   bool isLeadsLoading = false;
+  bool isOfficeLoading = false;
+  bool isLoadingSalesManagers = false;
   LeadDetailsModel leadDetailModel = LeadDetailsModel();
   CommunicationSummaryModel communicationSummaryModel =
       CommunicationSummaryModel();
@@ -24,6 +28,8 @@ class LeadDetailsController extends ChangeNotifier {
   StatusListModel statusListModel = StatusListModel();
   UsersListModel usersListModel = UsersListModel();
   LeadsListModel leadsListModel = LeadsListModel();
+  OfficeModel officeModel = OfficeModel();
+  SalesManagersListModel salesManagersList = SalesManagersListModel();
 
   fetchData(leadId, context) async {
     isLoading = true;
@@ -76,6 +82,37 @@ class LeadDetailsController extends ChangeNotifier {
     });
   }
 
+  Future<void> getSalesManagersByOfficeId(
+      String officeId, BuildContext context) async {
+    isLoadingSalesManagers = true;
+    notifyListeners();
+
+    log("LeadDetailsController -> getSalesManagersByOfficeId()");
+    await LeadDetailService.fetchSalesManagers(officeId).then((value) {
+      if (value?["data"] != null) {
+        salesManagersList = SalesManagersListModel.fromJson(value!);
+        isLoadingSalesManagers = false;
+      } else {
+        AppUtils.oneTimeSnackBar(
+          "Unable to fetch Sales Managers",
+          context: context,
+          bgColor: ColorTheme.red,
+        );
+        isLoadingSalesManagers = false;
+      }
+      notifyListeners();
+    }).catchError((error) {
+      log("Error fetching sales managers: $error");
+      AppUtils.oneTimeSnackBar(
+        "An error occurred while fetching sales managers",
+        context: context,
+        bgColor: ColorTheme.red,
+      );
+      isLoadingSalesManagers = false;
+      notifyListeners();
+    });
+  }
+
   getStatusList(context) async {
     isStatusLoading = true;
     notifyListeners();
@@ -100,6 +137,23 @@ class LeadDetailsController extends ChangeNotifier {
     await LeadDetailService.getUsersList().then((value) {
       if (value?["data"] != null) {
         usersListModel = UsersListModel.fromJson(value!);
+        isUsersLoading = false;
+      } else {
+        AppUtils.oneTimeSnackBar("Unable to fetch Data",
+            context: context, bgColor: ColorTheme.red);
+        isUsersLoading = false;
+      }
+      notifyListeners();
+    });
+  }
+
+  getOfficeList(context) async {
+    isUsersLoading = true;
+    notifyListeners();
+    log("LeadDetailsController -> getOfficeList()");
+    await LeadDetailService.getOfficeList().then((value) {
+      if (value?["data"] != null) {
+        officeModel = OfficeModel.fromJson(value!);
         isUsersLoading = false;
       } else {
         AppUtils.oneTimeSnackBar("Unable to fetch Data",
@@ -180,9 +234,42 @@ class LeadDetailsController extends ChangeNotifier {
     });
   }
 
-  sendMail(String subject, String to, String cc, String body,String leadId, context) async {
+  reAssign(
+      String leadId, String user, String officeId, BuildContext context) async {
+    log("LeadDetailsController -> reAssign()");
+    try {
+      final value = await LeadDetailService.reAssign(leadId, user, officeId);
+
+      // Ensure the widget is still mounted before showing a SnackBar
+      if (context.mounted) {
+        if (value["data"] != null) {
+          // Optionally show success message
+          // AppUtils.oneTimeSnackBar(value["message"], context: context, textStyle: TextStyle(fontSize: 18));
+        } else {
+          AppUtils.oneTimeSnackBar(
+            value["message"],
+            context: context,
+            bgColor: Colors.redAccent,
+          );
+        }
+      }
+    } catch (e) {
+      log('Error in reAssign: $e');
+      if (context.mounted) {
+        AppUtils.oneTimeSnackBar(
+          'An error occurred while reassigning',
+          context: context,
+          bgColor: Colors.redAccent,
+        );
+      }
+    }
+  }
+
+  sendMail(String subject, String to, String cc, String body, String leadId,
+      context) async {
     log("LeadDetailsController -> sendMail()");
-    await LeadDetailService.sendMail(subject, to, cc, body,leadId).then((value) {
+    await LeadDetailService.sendMail(subject, to, cc, body, leadId)
+        .then((value) {
       if (value["data"] != null) {
         // AppUtils.oneTimeSnackBar(value["message"], context: context,textStyle: TextStyle(fontSize: 18));
       } else {

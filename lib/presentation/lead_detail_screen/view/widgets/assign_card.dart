@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:omnisell_crm/core/constants/colors.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
 import 'package:provider/provider.dart';
 
@@ -43,20 +44,20 @@ class AssignCard extends StatelessWidget {
                 ),
               ),
             ),
-            // GestureDetector(
-            //   onTap: () {
-            //     showModalBottomSheet(
-            //       backgroundColor: Colors.white,
-            //       context: context,
-            //       isScrollControlled: true,
-            //       builder: (context) => ReAssignBottomSheet(leadId: leadId),
-            //     );
-            //   },
-            //   child: const Icon(
-            //     Icons.compare_arrows,
-            //     size: 24,
-            //   ),
-            // )
+            GestureDetector(
+              onTap: () {
+                showModalBottomSheet(
+                  backgroundColor: Colors.white,
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (context) => ReAssignBottomSheet(leadId: leadId),
+                );
+              },
+              child: const Icon(
+                Icons.compare_arrows,
+                size: 24,
+              ),
+            )
           ],
         ),
       ),
@@ -71,13 +72,16 @@ class ReAssignBottomSheet extends StatefulWidget {
     super.key,
     required this.leadId,
   });
+
   @override
   ReAssignBottomSheetState createState() => ReAssignBottomSheetState();
 }
 
 class ReAssignBottomSheetState extends State<ReAssignBottomSheet> {
+  String? officeId;
   String? assignTo;
   String? selectedUserId;
+  String? selectedOfficeId;
 
   final TextEditingController dateController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
@@ -87,6 +91,13 @@ class ReAssignBottomSheetState extends State<ReAssignBottomSheet> {
     super.initState();
     Provider.of<LeadDetailsController>(context, listen: false)
         .getUsersList(context);
+    Provider.of<LeadDetailsController>(context, listen: false)
+        .getOfficeList(context);
+  }
+
+  void _fetchSalesManagers(String officeId) async {
+    await Provider.of<LeadDetailsController>(context, listen: false)
+        .getSalesManagersByOfficeId(officeId, context);
   }
 
   @override
@@ -102,70 +113,86 @@ class ReAssignBottomSheetState extends State<ReAssignBottomSheet> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<String>(
-                value: assignTo,
+                value: officeId != null &&
+                        controller.officeModel.data
+                                ?.any((office) => office.name == officeId) ==
+                            true
+                    ? officeId
+                    : null,
                 onChanged: (String? newValue) {
                   if (newValue != null) {
                     setState(() {
-                      assignTo = newValue;
-                      selectedUserId = controller.usersListModel.data
-                          ?.firstWhere((user) => user.name == newValue)
+                      officeId = newValue;
+                      selectedOfficeId = controller.officeModel.data
+                          ?.firstWhere((office) => office.name == newValue)
                           .id
                           ?.toString();
+                      _fetchSalesManagers(selectedOfficeId!);
                     });
                   }
                 },
-                items: controller.usersListModel.data
-                        ?.map<DropdownMenuItem<String>>((user) {
+                items: controller.officeModel.data
+                        ?.map<DropdownMenuItem<String>>((office) {
                       return DropdownMenuItem<String>(
-                        value: user.name ?? '',
-                        child: Text(user.name ?? 'Unknown'),
+                        value: office.name ?? '',
+                        child: Text(office.name ?? 'Unknown'),
                       );
                     }).toList() ??
                     [],
                 decoration: InputDecoration(
-                  labelText: 'Assign To',
+                  labelText: 'Select Branch',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: dateController,
-                readOnly: true,
+              DropdownButtonFormField<String>(
+                value: assignTo != null &&
+                        controller.salesManagersList.data
+                                ?.any((user) => user.name == assignTo) ==
+                            true
+                    ? assignTo
+                    : null,
+                onChanged: controller.isLoadingSalesManagers
+                    ? null
+                    : (String? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            assignTo = newValue;
+                            selectedUserId = controller.salesManagersList.data
+                                ?.firstWhere((user) => user.name == newValue)
+                                .id
+                                ?.toString();
+                          });
+                        }
+                      },
+                items: controller.salesManagersList.data?.isNotEmpty == true
+                    ? controller.salesManagersList.data!
+                        .map<DropdownMenuItem<String>>((user) {
+                        return DropdownMenuItem<String>(
+                          value: user.name ?? '',
+                          child: Text(user.name ?? 'Unknown'),
+                        );
+                      }).toList()
+                    : [],
                 decoration: InputDecoration(
+                  labelText: controller.isLoadingSalesManagers
+                      ? 'Loading Sales Managers...'
+                      : 'Select Sales Manager',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  labelText: 'Followup Date',
-                  suffixIcon: const Icon(Icons.calendar_today),
                 ),
-                onTap: () async {
-                  DateTime? selectedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2100),
-                  );
-
-                  if (selectedDate != null) {
-                    setState(() {
-                      dateController.text =
-                          DateFormat('yyyy-MM-dd').format(selectedDate);
-                    });
-                  }
-                },
               ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: noteController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+              if (controller.isLoadingSalesManagers)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: LoadingAnimationWidget.waveDots(
+                    color: const Color(0xFF353967),
+                    size: 30,
                   ),
-                  labelText: 'Note',
                 ),
-              ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -194,13 +221,15 @@ class ReAssignBottomSheetState extends State<ReAssignBottomSheet> {
                   ElevatedButton(
                     onPressed: () {
                       Provider.of<LeadDetailsController>(context, listen: false)
-                          .addFollowUp(
-                              widget.leadId,
-                              dateController.text,
-                              selectedUserId ?? '',
-                              noteController.text,
-                              context);
+                          .reAssign(widget.leadId, selectedUserId ?? '',
+                              selectedOfficeId ?? '', context);
                       Navigator.of(context).pop();
+                      Provider.of<LeadDetailsController>(context, listen: false)
+                          .fetchData(widget.leadId, context);
+                      Provider.of<LeadDetailsController>(context, listen: false)
+                          .fetchCommunicationSummary(widget.leadId, context);
+                      Provider.of<LeadDetailsController>(context, listen: false)
+                          .fetchPhoneSummary(widget.leadId, context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF353967),

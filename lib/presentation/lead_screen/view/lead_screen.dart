@@ -18,7 +18,7 @@ class LeadScreen extends StatefulWidget {
 }
 
 class _LeadScreenState extends State<LeadScreen> {
-  bool isLoading = true; // Loading state
+  bool isLoading = true; 
 
   @override
   void initState() {
@@ -164,7 +164,8 @@ class _LeadScreenState extends State<LeadScreen> {
                                         null)
                                       iconTextRow(CustomIcons.whatsapp,
                                           "${controller.leadsModel.data?[index].whatsappNumber}"),
-                                    if (controller.leadsModel.data?[index].city !=
+                                    if (controller
+                                            .leadsModel.data?[index].city !=
                                         null)
                                       iconTextRow(Icons.pin_drop_rounded,
                                           "${controller.leadsModel.data?[index].city}"),

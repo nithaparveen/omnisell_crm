@@ -1,6 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_crm/core/constants/textstyles.dart';
@@ -12,6 +9,7 @@ import 'package:omnisell_crm/presentation/lead_detail_screen/view/widgets/lead_d
 import 'package:omnisell_crm/presentation/lead_detail_screen/view/widgets/lead_source_card.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/view/widgets/lead_status_card.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/view/widgets/task_card.dart';
+import 'package:omnisell_crm/presentation/timeline_screen/view/timeline_screen.dart';
 import 'package:provider/provider.dart';
 
 class LeadDetailScreen extends StatefulWidget {
@@ -22,9 +20,13 @@ class LeadDetailScreen extends StatefulWidget {
   State<LeadDetailScreen> createState() => _LeadDetailScreenState();
 }
 
-class _LeadDetailScreenState extends State<LeadDetailScreen> {
+class _LeadDetailScreenState extends State<LeadDetailScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController tabController;
+
   @override
   void initState() {
+    tabController = TabController(length: 2, vsync: this);
     fetchData();
     super.initState();
   }
@@ -57,153 +59,117 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
           "Lead Details",
           style: GLTextStyles.cabinStyle(size: 22),
         ),
-        actions: [
-          IconButton(
-            onPressed: fetchData,
-            tooltip: "Refresh",
-            icon: const Icon(
-              CupertinoIcons.refresh_circled,
-              size: 24,
-              color: Colors.black,
-            ),
-          ),
-        ],
+        bottom: TabBar(
+          controller: tabController,
+          labelColor: Colors.black,
+          indicatorColor: Colors.blue,
+          tabs: const [
+            Tab(text: 'Details'),
+            Tab(text: 'Timeline'),
+          ],
+        ),
         automaticallyImplyLeading: false,
         forceMaterialTransparency: true,
       ),
-      body: Consumer<LeadDetailsController>(builder: (context, controller, _) {
-        if (controller.isLoading) {
-          return ShimmerEffect(size: size);
-        }
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              DetailCard(
-                title: controller.leadDetailModel.data?.name ?? 'N/A',
-                addedDate: formatDate(
-                    controller.leadDetailModel.data?.createdAt?.toString() ??
-                        ''),
-                lastActive: formatDate(
-                    controller.leadDetailModel.data?.updatedAt?.toString() ??
-                        ''),
-                email: controller.leadDetailModel.data?.email ?? 'N/A',
-                phone:
-                    "${controller.leadDetailModel.data?.phoneNumber ?? 'N/A'}",
-              ),
-              LeadStatusCard(
-                percentageComplete: controller
-                        .leadDetailModel.data?.stage?.progressPercentage ??
-                    0,
-                leadStatus: controller
-                            .leadDetailModel.data?.stage?.description !=
-                        null
-                    ? '${controller.leadDetailModel.data?.stage?.description}'
-                    : "",
-                currentStage: '${controller.leadDetailModel.data?.stage?.name}',
-                leadId: "${controller.leadDetailModel.data?.id}",
-              ),
-              Row(
-                children: [
-                  Icon(
-                    Icons.messenger_outline_rounded,
-                    size: 16,
-                  ),
-                  SizedBox(
-                    width: size.width * .01,
-                  ),
-                  Text("Communication Status",
-                      style: GLTextStyles.robotoStyle(
-                          size: 16, weight: FontWeight.w500)),
-                ],
-              ),
-              CommunicationCard(
-                emailSend:
-                    "${controller.communicationSummaryModel.data?.emailSendSummary.toString()}",
-                emailReceiveSummary:
-                    "${controller.communicationSummaryModel.data?.emailReceiveSummary.toString()}",
-                phoneInbound:
-                    "${controller.phoneSummaryModel.data?.callsInbound.toString()}",
-                phoneOutbound:
-                    "${controller.phoneSummaryModel.data?.callsOutbound.toString()}",
-                leadId: "${controller.leadDetailModel.data?.id}",
-              ),
-              Row(
-                children: [
-                  Icon(
-                    Icons.calendar_today_outlined,
-                    size: 16,
-                  ),
-                  SizedBox(
-                    width: size.width * .01,
-                  ),
-                  Text("Upcoming Task & Follow-ups",
-                      style: GLTextStyles.robotoStyle(
-                          size: 16, weight: FontWeight.w500)),
-                ],
-              ),
-              TaskCard(
-                latestTask:
-                    controller.leadDetailModel.data?.latestTask?.dueDate != null
-                        ? formatDate1(controller
-                            .leadDetailModel.data!.latestTask!.dueDate
-                            .toString())
-                        : "NA",
-                latestFollowUp: controller.leadDetailModel.data?.latestFollowUp
-                            ?.followUpDate !=
-                        null
-                    ? formatDate1(controller
-                        .leadDetailModel.data!.latestFollowUp!.followUpDate
-                        .toString())
-                    : "NA",
-                leadId: "${controller.leadDetailModel.data?.id}",
-              ),
-              Row(
-                children: [
-                  Icon(
-                    Icons.share_outlined,
-                    size: 16,
-                  ),
-                  SizedBox(
-                    width: size.width * .01,
-                  ),
-                  Text("Lead Source",
-                      style: GLTextStyles.robotoStyle(
-                          size: 16, weight: FontWeight.w500)),
-                ],
-              ),
-              LeadSourceCard(
-                  leadSource: controller
-                              .leadDetailModel.data?.leadSource?.name !=
+      body: TabBarView(
+        controller: tabController,
+        children: [
+          buildDetailsTab(size),
+          const TimeLineScreen(),
+        ],
+      ),
+    );
+  }
+
+  Widget buildDetailsTab(Size size) {
+    return Consumer<LeadDetailsController>(builder: (context, controller, _) {
+      if (controller.isLoading) {
+        return ShimmerEffect(size: size);
+      }
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            DetailCard(
+              title: controller.leadDetailModel.data?.name ?? 'N/A',
+              addedDate: formatDate(
+                  controller.leadDetailModel.data?.createdAt?.toString() ?? ''),
+              lastActive: formatDate(
+                  controller.leadDetailModel.data?.updatedAt?.toString() ?? ''),
+              email: controller.leadDetailModel.data?.email ?? 'N/A',
+              phone: "${controller.leadDetailModel.data?.phoneNumber ?? 'N/A'}",
+            ),
+            LeadStatusCard(
+              percentageComplete:
+                  controller.leadDetailModel.data?.stage?.progressPercentage ??
+                      0,
+              leadStatus:
+                  controller.leadDetailModel.data?.stage?.description ?? "",
+              currentStage: '${controller.leadDetailModel.data?.stage?.name}',
+              leadId: "${controller.leadDetailModel.data?.id}",
+            ),
+            buildSectionTitle(Icons.messenger_outline_rounded,
+                "Communication Status", size),
+            CommunicationCard(
+              emailSend:
+                  "${controller.communicationSummaryModel.data?.emailSendSummary}",
+              emailReceiveSummary:
+                  "${controller.communicationSummaryModel.data?.emailReceiveSummary}",
+              phoneInbound:
+                  "${controller.phoneSummaryModel.data?.callsInbound}",
+              phoneOutbound:
+                  "${controller.phoneSummaryModel.data?.callsOutbound}",
+              leadId: "${controller.leadDetailModel.data?.id}",
+            ),
+            buildSectionTitle(Icons.calendar_today_outlined,
+                "Upcoming Task & Follow-ups", size),
+            TaskCard(
+              latestTask: controller.leadDetailModel.data?.latestTask?.dueDate !=
+                      null
+                  ? formatDate1(
+                      controller.leadDetailModel.data!.latestTask!.dueDate
+                          .toString())
+                  : "NA",
+              latestFollowUp:
+                  controller.leadDetailModel.data?.latestFollowUp?.followUpDate !=
                           null
-                      ? "${controller.leadDetailModel.data?.leadSource?.name}"
-                      : "NA"),
-              Row(
-                children: [
-                  Icon(
-                    Icons.person_add_outlined,
-                    size: 16,
-                  ),
-                  SizedBox(
-                    width: size.width * .01,
-                  ),
-                  Text("Assigned Salesperson",
-                      style: GLTextStyles.robotoStyle(
-                          size: 16, weight: FontWeight.w500)),
-                ],
-              ),
-              AssignCard(
-                assignTo:
-                    controller.leadDetailModel.data?.assignedTo?.name != null
-                        ? "${controller.leadDetailModel.data?.assignedTo?.name}"
-                        : "NA",
-                leadId: "${controller.leadDetailModel.data?.id}",
-              )
-            ],
-          ),
-        );
-      }),
+                      ? formatDate1(controller.leadDetailModel.data!
+                          .latestFollowUp!.followUpDate
+                          .toString())
+                      : "NA",
+              leadId: "${controller.leadDetailModel.data?.id}",
+            ),
+            buildSectionTitle(Icons.share_outlined, "Lead Source", size),
+            LeadSourceCard(
+              leadSource: controller.leadDetailModel.data?.leadSource?.name ??
+                  "NA",
+            ),
+            buildSectionTitle(
+                Icons.person_add_outlined, "Assigned Salesperson", size),
+            AssignCard(
+              assignTo: controller.leadDetailModel.data?.assignedTo?.name ?? "NA",
+              leadId: "${controller.leadDetailModel.data?.id}",
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget buildSectionTitle(IconData icon, String title, Size size) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 16,
+        ),
+        SizedBox(
+          width: size.width * .01,
+        ),
+        Text(title,
+            style: GLTextStyles.robotoStyle(size: 16, weight: FontWeight.w500)),
+      ],
     );
   }
 

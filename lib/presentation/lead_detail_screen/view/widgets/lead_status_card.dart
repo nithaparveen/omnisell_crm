@@ -254,6 +254,12 @@ class StatusChangeBottomSheetState extends State<StatusChangeBottomSheet> {
                     Provider.of<LeadDetailsController>(context, listen: false)
                         .changeStage(widget.leadId, selectedStageId, context);
                   });
+                  Provider.of<LeadDetailsController>(context, listen: false)
+                      .fetchData(widget.leadId, context);
+                  Provider.of<LeadDetailsController>(context, listen: false)
+                      .fetchCommunicationSummary(widget.leadId, context);
+                  Provider.of<LeadDetailsController>(context, listen: false)
+                      .fetchPhoneSummary(widget.leadId, context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF353967),

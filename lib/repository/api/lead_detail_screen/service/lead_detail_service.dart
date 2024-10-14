@@ -42,6 +42,20 @@ class LeadDetailService {
     }
   }
 
+  static Future<dynamic> fetchSalesManagers(String officeId) async {
+    log("LeadDetailService -> fetchSalesManagers()");
+    try {
+      var decodedData = await ApiHelper.getData(
+        endPoint: "listing/users?office_id=$officeId&role_id=4",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("Error in LeadDetailService -> fetchSalesManagers(): $e");
+      return null;
+    }
+  }
+
   static Future<dynamic> getStatusList() async {
     log("LeadDetailService -> getStatusList()");
     try {
@@ -60,6 +74,19 @@ class LeadDetailService {
     try {
       var decodedData = await ApiHelper.getData(
         endPoint: "listing/accessable-users",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+  }
+
+  static Future<dynamic> getOfficeList() async {
+    log("LeadDetailService -> getOfficeList()");
+    try {
+      var decodedData = await ApiHelper.getData(
+        endPoint: "listing/offices",
         header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
       );
       return decodedData;
@@ -123,11 +150,25 @@ class LeadDetailService {
   }
 
   static Future<dynamic> addFollowUp(leadId, date, user, note) async {
-    log("LeadDetailService -> addTask()");
+    log("LeadDetailService -> addFollowUp()");
     try {
       var decodedData = await ApiHelper.postData(
         endPoint:
             "follow-ups/store?lead_id=$leadId&follow_up_date=$date&assigned_to=$user&note=$note",
+        header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
+      );
+      return decodedData;
+    } catch (e) {
+      log("$e");
+    }
+  }
+
+  static Future<dynamic> reAssign(leadId, user, officeId) async {
+    log("LeadDetailService -> reAssign()");
+    try {
+      var decodedData = await ApiHelper.postData(
+        endPoint:
+            "leads/re-assign?lead_id=$leadId&user_id=$user&assign_to_office_id=$officeId",
         header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
       );
       return decodedData;
