@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_crm/core/constants/textstyles.dart';
 import 'package:omnisell_crm/global_widgets/shimmer_effect.dart';
+import 'package:omnisell_crm/presentation/communication_logs_screen/view/communication_logs_screen.dart';
+import 'package:omnisell_crm/presentation/follow_up_screen/view/follow_up_screen.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/view/widgets/assign_card.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/view/widgets/communication_card.dart';
@@ -9,6 +11,8 @@ import 'package:omnisell_crm/presentation/lead_detail_screen/view/widgets/lead_d
 import 'package:omnisell_crm/presentation/lead_detail_screen/view/widgets/lead_source_card.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/view/widgets/lead_status_card.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/view/widgets/task_card.dart';
+import 'package:omnisell_crm/presentation/payments_screen/view/payments_screen.dart';
+import 'package:omnisell_crm/presentation/task_screen/view/task_screen.dart';
 import 'package:omnisell_crm/presentation/timeline_screen/view/timeline_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +30,7 @@ class _LeadDetailScreenState extends State<LeadDetailScreen>
 
   @override
   void initState() {
-    tabController = TabController(length: 2, vsync: this);
+    tabController = TabController(length: 6, vsync: this);
     fetchData();
     super.initState();
   }
@@ -62,10 +66,16 @@ class _LeadDetailScreenState extends State<LeadDetailScreen>
         bottom: TabBar(
           controller: tabController,
           labelColor: Colors.black,
-          indicatorColor: Colors.blue,
+          indicatorColor: Colors.blueAccent,
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
           tabs: const [
             Tab(text: 'Details'),
             Tab(text: 'Timeline'),
+            Tab(text: 'Follow-Up & Notes'),
+            Tab(text: 'Communication Logs'),
+            Tab(text: 'Payments'),
+            Tab(text: 'Task'),
           ],
         ),
         automaticallyImplyLeading: false,
@@ -76,6 +86,10 @@ class _LeadDetailScreenState extends State<LeadDetailScreen>
         children: [
           buildDetailsTab(size),
           const TimeLineScreen(),
+          const FollowUpScreen(),
+          const CommunicationLogsScreen(),
+          const PaymentScreen(),
+          const TaskScreen(),
         ],
       ),
     );
