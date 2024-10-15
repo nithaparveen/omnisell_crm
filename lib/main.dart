@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:omnisell_crm/app_config/app_config.dart';
 import 'package:omnisell_crm/presentation/bottom_navigation_screen/controller/bottom_navigation_controller.dart';
 import 'package:omnisell_crm/presentation/bottom_navigation_screen/view/bottom_navigation_screen.dart';
+import 'package:omnisell_crm/presentation/follow_up_screen/controller/follow_up_controller.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
 import 'package:omnisell_crm/presentation/lead_screen/controller/lead_controller.dart';
 import 'package:omnisell_crm/presentation/login_screen/controlller/login_controller.dart';
 import 'package:omnisell_crm/presentation/login_screen/view/login_screen.dart';
+import 'package:omnisell_crm/presentation/timeline_screen/controller/timeline_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,6 +20,8 @@ void main() async {
     ChangeNotifierProvider(create: (context) => BottomNavigationController()),
     ChangeNotifierProvider(create: (context) => LeadsController()),
     ChangeNotifierProvider(create: (context) => LeadDetailsController()),
+    ChangeNotifierProvider(create: (context) => TImeLineController()),
+    ChangeNotifierProvider(create: (context) => FollowUpController()),
   ], child: MyApp(isLoggedIn: loggedIn)));
 }
 

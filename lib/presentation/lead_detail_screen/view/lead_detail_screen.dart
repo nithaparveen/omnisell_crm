@@ -18,7 +18,7 @@ import 'package:provider/provider.dart';
 
 class LeadDetailScreen extends StatefulWidget {
   const LeadDetailScreen({super.key, required this.leadId});
-  final int leadId;
+  final String leadId;
 
   @override
   State<LeadDetailScreen> createState() => _LeadDetailScreenState();
@@ -85,8 +85,8 @@ class _LeadDetailScreenState extends State<LeadDetailScreen>
         controller: tabController,
         children: [
           buildDetailsTab(size),
-          const TimeLineScreen(),
-          const FollowUpScreen(),
+          TimeLineScreen(leadId: widget.leadId),
+          FollowUpScreen(leadId: widget.leadId),
           const CommunicationLogsScreen(),
           const PaymentScreen(),
           const TaskScreen(),

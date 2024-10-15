@@ -18,7 +18,7 @@ class LeadScreen extends StatefulWidget {
 }
 
 class _LeadScreenState extends State<LeadScreen> {
-  bool isLoading = true; 
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -88,8 +88,7 @@ class _LeadScreenState extends State<LeadScreen> {
                               MaterialPageRoute(
                                 builder: (context) => LeadDetailScreen(
                                     leadId:
-                                        controller.leadsModel.data?[index].id ??
-                                            0),
+                                        "${controller.leadsModel.data?[index].id ?? 0}"),
                               ),
                             ),
                             child: Card(

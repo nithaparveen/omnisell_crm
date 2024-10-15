@@ -45,6 +45,7 @@ dependencies:
   shimmer: ^3.0.0
   vibration:
   loading_animation_widget: ^1.3.0
+  timelines_plus: ^1.0.3
 
 
 dev_dependencies:
