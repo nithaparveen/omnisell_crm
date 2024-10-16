@@ -87,7 +87,7 @@ class _LeadDetailScreenState extends State<LeadDetailScreen>
           buildDetailsTab(size),
           TimeLineScreen(leadId: widget.leadId),
           FollowUpScreen(leadId: widget.leadId),
-          const CommunicationLogsScreen(),
+           CommunicationLogsScreen(leadId: widget.leadId),
           const PaymentScreen(),
           const TaskScreen(),
         ],

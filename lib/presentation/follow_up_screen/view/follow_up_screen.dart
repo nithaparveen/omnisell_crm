@@ -32,8 +32,7 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
           return const Center(child: CircularProgressIndicator());
         }
         if (controller.followUpModel.data == null ||
-            controller.followUpModel.data!.isEmpty) {
-          return const Center(child: Text("No timeline events available"));
+            controller.followUpModel.data!.isEmpty) {          return const Center(child: Text("No Follow-Up & Notes available"));
         }
 
         return SingleChildScrollView(
@@ -49,7 +48,7 @@ class _FollowUpScreenState extends State<FollowUpScreen> {
                       color: Colors.black,
                     ),
                   ),
-                  // Use asMap() to get the index along with the event
+                 
                   children: controller.followUpModel.data!
                       .asMap()
                       .entries
