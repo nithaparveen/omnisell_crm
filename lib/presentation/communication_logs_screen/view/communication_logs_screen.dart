@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_crm/core/constants/textstyles.dart';
 import 'package:omnisell_crm/custom_icons_icons.dart';
+import 'package:omnisell_crm/presentation/communication_logs_screen/controller/communication_controller.dart';
+import 'package:omnisell_crm/presentation/communication_logs_screen/view/widgets/call_screen.dart';
+import 'package:omnisell_crm/presentation/communication_logs_screen/view/widgets/email_screen.dart';
+import 'package:omnisell_crm/presentation/communication_logs_screen/view/widgets/whatsaapp_screen.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
 import 'package:provider/provider.dart';
 
 class CommunicationLogsScreen extends StatefulWidget {
   const CommunicationLogsScreen({super.key, required this.leadId});
-    final String leadId;
+  final String leadId;
 
   @override
   State<CommunicationLogsScreen> createState() =>
@@ -15,7 +19,7 @@ class CommunicationLogsScreen extends StatefulWidget {
 }
 
 class _CommunicationLogsScreenState extends State<CommunicationLogsScreen> {
-    @override
+  @override
   void initState() {
     fetchData();
     super.initState();
@@ -33,83 +37,129 @@ class _CommunicationLogsScreenState extends State<CommunicationLogsScreen> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context);
-    return Consumer<LeadDetailsController>(
-      builder: (context,controller,_) {
-        return SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              children: [
-                buildSectionTitle(Icons.email_outlined, "Email Summary", size),
-                SizedBox(
-                  height: size.width * .01,
-                ),
-                buildBox("${controller.communicationSummaryModel.data?.emailSendSummary}", "Sent", "${controller.communicationSummaryModel.data?.emailReceiveSummary}", "Recieved", size,
-                    const Color.fromARGB(255, 172, 228, 184), Colors.white),
-                SizedBox(
-                  height: size.width * .02,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0, left: 230),
-                  child: buildSendButton("Send Mail", size, () {
-                    showModalBottomSheet(
-                          backgroundColor: Colors.white,
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (context) => MailBottomSheet(
+    return Consumer<LeadDetailsController>(builder: (context, controller, _) {
+      return SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            children: [
+              buildSectionTitle(Icons.email_outlined, "Email Summary", size),
+              SizedBox(
+                height: size.width * .01,
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: ((context) => EmailScreen(
                                 leadId: widget.leadId,
-                              ));
-                  }),
-                ),
-                buildSectionTitle(CustomIcons.whatsapp, "WhatsApp Summary", size),
-                SizedBox(
-                  height: size.width * .01,
-                ),
-                buildBox("${controller.communicationSummaryModel.data?.whatsappSendSummary}", "Sent", "${controller.communicationSummaryModel.data?.whatsappReceiveSummary}", "Recieved", size,
-                    const Color.fromARGB(255, 172, 172, 228), Colors.white),
-                SizedBox(
-                  height: size.width * .02,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 10.0, left: 200),
-                  child: buildSendButton("Send WhatsApp", size, () {
-                    showModalBottomSheet(
-                          backgroundColor: Colors.white,
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (context) => WhatsappBottomSheet(
+                              ))));
+                },
+                child: buildBox(
+                    "${controller.communicationSummaryModel.data?.emailSendSummary}",
+                    "Sent",
+                    "${controller.communicationSummaryModel.data?.emailReceiveSummary}",
+                    "Recieved",
+                    size,
+                    const Color.fromARGB(255, 172, 228, 184),
+                    Colors.white),
+              ),
+              SizedBox(
+                height: size.width * .02,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0, left: 230),
+                child: buildSendButton("Send Mail", size, () {
+                  showModalBottomSheet(
+                      backgroundColor: Colors.white,
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (context) => MailBottomSheet(
+                            leadId: widget.leadId,
+                          ));
+                }),
+              ),
+              buildSectionTitle(CustomIcons.whatsapp, "WhatsApp Summary", size),
+              SizedBox(
+                height: size.width * .01,
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: ((context) =>
+                              WhatsAppScreen(leadId: widget.leadId))));
+                },
+                child: buildBox(
+                    "${controller.communicationSummaryModel.data?.whatsappSendSummary}",
+                    "Sent",
+                    "${controller.communicationSummaryModel.data?.whatsappReceiveSummary}",
+                    "Recieved",
+                    size,
+                    const Color.fromARGB(255, 172, 172, 228),
+                    Colors.white),
+              ),
+              SizedBox(
+                height: size.width * .02,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 10.0, left: 200),
+                child: buildSendButton("Send WhatsApp", size, () {
+                  showModalBottomSheet(
+                      backgroundColor: Colors.white,
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (context) => WhatsappBottomSheet(
+                            leadId: widget.leadId,
+                          ));
+                }),
+              ),
+              buildSectionTitle(
+                  CustomIcons.phone_1, "Phone Call Summary", size),
+              SizedBox(
+                height: size.width * .01,
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: ((context) => CallScreen(
                                 leadId: widget.leadId,
-                              ));
-                  }),
-                ),
-                buildSectionTitle(CustomIcons.phone_1, "Phone Call Summary", size),
-                SizedBox(
-                  height: size.width * .01,
-                ),
-                buildBox("${controller.phoneSummaryModel.data?.callsInbound}", "Inbound", "${controller.phoneSummaryModel.data?.callsOutbound}","Outbound", size,
-                    const Color.fromARGB(255, 236, 183, 183), Colors.white),
-                SizedBox(
-                  height: size.width * .02,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0, left: 230),
-                  child: buildSendButton("Add Call", size, () {
-                    showModalBottomSheet(
-                        backgroundColor: Colors.white,
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (context) => CalLogBottomSheet(
-                          leadId: widget.leadId,
-                        ),
-                      );
-                  }),
-                ),
-              ],
-            ),
+                              ))));
+                },
+                child: buildBox(
+                    "${controller.phoneSummaryModel.data?.callsInbound}",
+                    "Inbound",
+                    "${controller.phoneSummaryModel.data?.callsOutbound}",
+                    "Outbound",
+                    size,
+                    const Color.fromARGB(255, 236, 183, 183),
+                    Colors.white),
+              ),
+              SizedBox(
+                height: size.width * .02,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0, left: 230),
+                child: buildSendButton("Add Call", size, () {
+                  showModalBottomSheet(
+                    backgroundColor: Colors.white,
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) => CalLogBottomSheet(
+                      leadId: widget.leadId,
+                    ),
+                  );
+                }),
+              ),
+            ],
           ),
-        );
-      }
-    );
+        ),
+      );
+    });
   }
 
   Widget buildSectionTitle(IconData icon, String title, Size size) {
@@ -353,6 +403,7 @@ class MailBottomSheetState extends State<MailBottomSheet> {
     );
   }
 }
+
 class WhatsappBottomSheet extends StatefulWidget {
   final String leadId;
 
@@ -405,7 +456,6 @@ class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
                     labelText: 'Message To',
                     hintText: 'WhatsApp Number',
                   ),
-                  readOnly: true,
                 ),
                 const SizedBox(height: 10),
                 TextField(
@@ -418,7 +468,6 @@ class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
                     labelText: 'Message',
                   ),
                 ),
-                
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -443,16 +492,11 @@ class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
                             MaterialStatePropertyAll(Color(0xFF353967)),
                       ),
                       onPressed: () {
-                        // Provider.of<LeadDetailsController>(context,
-                        //         listen: false)
-                        //     .sendMail(
-                        //         subjectController.text,
-                        //         toController.text,
-                        //         ccController.text,
-                        //         bodyController.text,
-                        //         widget.leadId,
-                        //         context);
-                        // Navigator.of(context).pop();
+                        Provider.of<CommunicationController>(context,
+                                listen: false)
+                            .sendWhatsapp( messageController.text,toController.text,
+                                widget.leadId, context);
+                        Navigator.of(context).pop();
                       },
                       child: const Text(
                         'Send',
@@ -469,6 +513,7 @@ class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
     );
   }
 }
+
 class CalLogBottomSheet extends StatefulWidget {
   final String leadId;
 

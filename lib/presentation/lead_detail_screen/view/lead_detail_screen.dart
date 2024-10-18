@@ -66,6 +66,7 @@ class _LeadDetailScreenState extends State<LeadDetailScreen>
         bottom: TabBar(
           controller: tabController,
           labelColor: Colors.black,
+          unselectedLabelColor: const Color.fromARGB(255, 117, 117, 117),
           indicatorColor: Colors.blueAccent,
           isScrollable: true,
           tabAlignment: TabAlignment.start,
@@ -87,9 +88,9 @@ class _LeadDetailScreenState extends State<LeadDetailScreen>
           buildDetailsTab(size),
           TimeLineScreen(leadId: widget.leadId),
           FollowUpScreen(leadId: widget.leadId),
-           CommunicationLogsScreen(leadId: widget.leadId),
-          const PaymentScreen(),
-          const TaskScreen(),
+          CommunicationLogsScreen(leadId: widget.leadId),
+          PaymentScreen(leadId: widget.leadId),
+          TaskScreen(leadId: widget.leadId),
         ],
       ),
     );
@@ -123,8 +124,8 @@ class _LeadDetailScreenState extends State<LeadDetailScreen>
               currentStage: '${controller.leadDetailModel.data?.stage?.name}',
               leadId: "${controller.leadDetailModel.data?.id}",
             ),
-            buildSectionTitle(Icons.messenger_outline_rounded,
-                "Communication Status", size),
+            buildSectionTitle(
+                Icons.messenger_outline_rounded, "Communication Status", size),
             CommunicationCard(
               emailSend:
                   "${controller.communicationSummaryModel.data?.emailSendSummary}",
@@ -139,30 +140,31 @@ class _LeadDetailScreenState extends State<LeadDetailScreen>
             buildSectionTitle(Icons.calendar_today_outlined,
                 "Upcoming Task & Follow-ups", size),
             TaskCard(
-              latestTask: controller.leadDetailModel.data?.latestTask?.dueDate !=
-                      null
-                  ? formatDate1(
-                      controller.leadDetailModel.data!.latestTask!.dueDate
-                          .toString())
-                  : "NA",
-              latestFollowUp:
-                  controller.leadDetailModel.data?.latestFollowUp?.followUpDate !=
-                          null
-                      ? formatDate1(controller.leadDetailModel.data!
-                          .latestFollowUp!.followUpDate
+              latestTask:
+                  controller.leadDetailModel.data?.latestTask?.dueDate != null
+                      ? formatDate1(controller
+                          .leadDetailModel.data!.latestTask!.dueDate
                           .toString())
                       : "NA",
+              latestFollowUp: controller
+                          .leadDetailModel.data?.latestFollowUp?.followUpDate !=
+                      null
+                  ? formatDate1(controller
+                      .leadDetailModel.data!.latestFollowUp!.followUpDate
+                      .toString())
+                  : "NA",
               leadId: "${controller.leadDetailModel.data?.id}",
             ),
             buildSectionTitle(Icons.share_outlined, "Lead Source", size),
             LeadSourceCard(
-              leadSource: controller.leadDetailModel.data?.leadSource?.name ??
-                  "NA",
+              leadSource:
+                  controller.leadDetailModel.data?.leadSource?.name ?? "NA",
             ),
             buildSectionTitle(
                 Icons.person_add_outlined, "Assigned Salesperson", size),
             AssignCard(
-              assignTo: controller.leadDetailModel.data?.assignedTo?.name ?? "NA",
+              assignTo:
+                  controller.leadDetailModel.data?.assignedTo?.name ?? "NA",
               leadId: "${controller.leadDetailModel.data?.id}",
             ),
           ],
