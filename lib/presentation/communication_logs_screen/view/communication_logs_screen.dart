@@ -280,6 +280,8 @@ class MailBottomSheetState extends State<MailBottomSheet> {
   TextEditingController bodyController = TextEditingController();
   TextEditingController bodyFooterController = TextEditingController();
 
+  bool isTemplateSelected = false; // Track if the template is selected
+
   @override
   void initState() {
     super.initState();
@@ -294,6 +296,17 @@ class MailBottomSheetState extends State<MailBottomSheet> {
     bodyController.dispose();
     bodyFooterController.dispose();
     super.dispose();
+  }
+
+  void fillThankYouTemplate() {
+    setState(() {
+      subjectController.text = 'Thank you for contacting us';
+      bodyController.text = 'Dear,\n\nThank you for contacting us.\n'
+          'We will sort out your enquiries at the earliest.\n'
+          'Your mail id and phone number is import2@gmail.com and 949685660.\n'
+          'Also, you submitted a lead for Test import 1, and it is assigned to Manager FT.';
+      isTemplateSelected = true;
+    });
   }
 
   @override
@@ -311,6 +324,32 @@ class MailBottomSheetState extends State<MailBottomSheet> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Row for template selection
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Select Template:',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                    ElevatedButton(
+                      onPressed: fillThankYouTemplate,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isTemplateSelected
+                            ? Colors.green // Color when selected
+                            : const Color(0xFF353967), // Default color
+                      ),
+                      child: const Text(
+                        'Thank You',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+
+                // 'To' field
                 TextField(
                   controller: toController,
                   decoration: InputDecoration(
@@ -323,6 +362,8 @@ class MailBottomSheetState extends State<MailBottomSheet> {
                   readOnly: true,
                 ),
                 const SizedBox(height: 10),
+
+                // 'CC' field
                 TextField(
                   controller: ccController,
                   decoration: InputDecoration(
@@ -333,6 +374,8 @@ class MailBottomSheetState extends State<MailBottomSheet> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
+                // 'Subject' field
                 TextField(
                   controller: subjectController,
                   decoration: InputDecoration(
@@ -343,6 +386,8 @@ class MailBottomSheetState extends State<MailBottomSheet> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
+                // 'Body' field
                 const Text('Body'),
                 TextField(
                   controller: bodyController,
@@ -354,6 +399,8 @@ class MailBottomSheetState extends State<MailBottomSheet> {
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                // Buttons for sending or canceling
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -362,12 +409,12 @@ class MailBottomSheetState extends State<MailBottomSheet> {
                           backgroundColor:
                               MaterialStatePropertyAll(Colors.white)),
                       onPressed: () => Navigator.of(context).pop(),
-                      child: Text(
+                      child: const Text(
                         'Cancel',
-                        style: GLTextStyles.cabinStyle(
-                          size: 14,
-                          color: const Color(0xFF353967),
-                          weight: FontWeight.w500,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF353967),
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -411,6 +458,7 @@ class WhatsappBottomSheet extends StatefulWidget {
     super.key,
     required this.leadId,
   });
+
   @override
   WhatsappBottomSheetState createState() => WhatsappBottomSheetState();
 }
@@ -418,6 +466,8 @@ class WhatsappBottomSheet extends StatefulWidget {
 class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
   TextEditingController toController = TextEditingController();
   TextEditingController messageController = TextEditingController();
+
+  bool isTemplateSelected = false;
 
   @override
   void initState() {
@@ -430,6 +480,19 @@ class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
     toController.dispose();
     messageController.dispose();
     super.dispose();
+  }
+
+  void fillWhatsappTemplate() {
+    setState(() {
+      messageController.text = 'Hello,\n\n'
+          'Thank you for reaching out to Fasttrack Emarat. We’ve received your message, '
+          'and one of our representatives will get in touch with you as soon as possible.\n\n'
+          'For immediate assistance, feel free to contact us at 800fasttrack.\n\n'
+          'Best regards,\n'
+          'Team Fasttrack Emarat';
+
+      isTemplateSelected = true;
+    });
   }
 
   @override
@@ -447,6 +510,31 @@ class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Select Template:',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                    ElevatedButton(
+                      onPressed: fillWhatsappTemplate,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isTemplateSelected
+                            ? Colors.green
+                            : const Color(0xFF353967),
+                      ),
+                      child: const Text(
+                        'Welcome Message',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+
+                // 'To' field
                 TextField(
                   controller: toController,
                   decoration: InputDecoration(
@@ -458,6 +546,8 @@ class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
                   ),
                 ),
                 const SizedBox(height: 10),
+
+                // 'Message' field
                 TextField(
                   controller: messageController,
                   maxLines: 4,
@@ -469,20 +559,22 @@ class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                // Send and Cancel Buttons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton(
                       style: const ButtonStyle(
-                          backgroundColor:
-                              MaterialStatePropertyAll(Colors.white)),
+                        backgroundColor: MaterialStatePropertyAll(Colors.white),
+                      ),
                       onPressed: () => Navigator.of(context).pop(),
-                      child: Text(
+                      child: const Text(
                         'Cancel',
-                        style: GLTextStyles.cabinStyle(
-                          size: 14,
-                          color: const Color(0xFF353967),
-                          weight: FontWeight.w500,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF353967),
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -494,8 +586,8 @@ class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
                       onPressed: () {
                         Provider.of<CommunicationController>(context,
                                 listen: false)
-                            .sendWhatsapp( messageController.text,toController.text,
-                                widget.leadId, context);
+                            .sendWhatsapp(messageController.text,
+                                toController.text, widget.leadId, context);
                         Navigator.of(context).pop();
                       },
                       child: const Text(
