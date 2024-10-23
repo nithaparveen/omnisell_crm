@@ -32,19 +32,22 @@ class LeadDetailsController extends ChangeNotifier {
   SalesManagersListModel salesManagersList = SalesManagersListModel();
 
   fetchData(leadId, context) async {
-    isLoading = true;
-    notifyListeners();
-    log("LeadDetailsController -> fetchData()");
-    await LeadDetailService.fetchDetailData(leadId).then((value) {
-      if (value?["data"] != null) {
-        leadDetailModel = LeadDetailsModel.fromJson(value!);
-        isLoading = false;
-      } else {
-        AppUtils.oneTimeSnackBar("Unable to fetch Data",
-            context: context, bgColor: ColorTheme.red);
-        isLoading = false;
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      isLoading = true;
       notifyListeners();
+      log("LeadDetailsController -> fetchData()");
+
+      await LeadDetailService.fetchDetailData(leadId).then((value) {
+        if (value?["data"] != null) {
+          leadDetailModel = LeadDetailsModel.fromJson(value!);
+          isLoading = false;
+        } else {
+          AppUtils.oneTimeSnackBar("Unable to fetch Data",
+              context: context, bgColor: ColorTheme.red);
+          isLoading = false;
+        }
+        notifyListeners();
+      });
     });
   }
 
@@ -131,19 +134,21 @@ class LeadDetailsController extends ChangeNotifier {
   }
 
   getUsersList(context) async {
-    isUsersLoading = true;
-    notifyListeners();
-    log("LeadDetailsController -> getUsersList()");
-    await LeadDetailService.getUsersList().then((value) {
-      if (value?["data"] != null) {
-        usersListModel = UsersListModel.fromJson(value!);
-        isUsersLoading = false;
-      } else {
-        AppUtils.oneTimeSnackBar("Unable to fetch Data",
-            context: context, bgColor: ColorTheme.red);
-        isUsersLoading = false;
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      isUsersLoading = true;
       notifyListeners();
+      log("LeadDetailsController -> getUsersList()");
+      await LeadDetailService.getUsersList().then((value) {
+        if (value?["data"] != null) {
+          usersListModel = UsersListModel.fromJson(value!);
+          isUsersLoading = false;
+        } else {
+          AppUtils.oneTimeSnackBar("Unable to fetch Data",
+              context: context, bgColor: ColorTheme.red);
+          isUsersLoading = false;
+        }
+        notifyListeners();
+      });
     });
   }
 
@@ -165,23 +170,25 @@ class LeadDetailsController extends ChangeNotifier {
   }
 
   getLeadsList(context) async {
-    isLeadsLoading = true;
-    notifyListeners();
-    log("LeadDetailsController -> getLeadsList()");
-    await LeadDetailService.getLeadsList().then((value) {
-      if (value?["data"] != null) {
-        leadsListModel = LeadsListModel.fromJson(value!);
-        isLeadsLoading = false;
-      } else {
-        AppUtils.oneTimeSnackBar("Unable to fetch Data",
-            context: context, bgColor: ColorTheme.red);
-        isLeadsLoading = false;
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      isLeadsLoading = true;
       notifyListeners();
+      log("LeadDetailsController -> getLeadsList()");
+      await LeadDetailService.getLeadsList().then((value) {
+        if (value?["data"] != null) {
+          leadsListModel = LeadsListModel.fromJson(value!);
+          isLeadsLoading = false;
+        } else {
+          AppUtils.oneTimeSnackBar("Unable to fetch Data",
+              context: context, bgColor: ColorTheme.red);
+          isLeadsLoading = false;
+        }
+        notifyListeners();
+      });
     });
   }
 
-  changeStage(String leadId, String stageId, context) async {
+  changeStage(leadId, String stageId, context) async {
     log("LeadDetailsController -> changeStage()");
     await LeadDetailService.changeStage(leadId, stageId).then((value) {
       if (value["message"] == "Lead stage successfully changed.") {
@@ -193,8 +200,8 @@ class LeadDetailsController extends ChangeNotifier {
     });
   }
 
-  addCallLog(String leadId, String type, String dateTime, String summary,
-      context) async {
+  addCallLog(
+      leadId, String type, String dateTime, String summary, context) async {
     log("LeadDetailsController -> addCallLog()");
     await LeadDetailService.addCallLog(leadId, type, dateTime, summary)
         .then((value) {
@@ -207,8 +214,8 @@ class LeadDetailsController extends ChangeNotifier {
     });
   }
 
-  addTask(String title, String date, String user, String leadId,
-      String description, context) async {
+  addTask(String title, String date, String user, leadId, String description,
+      context) async {
     log("LeadDetailsController -> addTask()");
     await LeadDetailService.addTask(title, date, user, leadId, description)
         .then((value) {
@@ -221,8 +228,7 @@ class LeadDetailsController extends ChangeNotifier {
     });
   }
 
-  addFollowUp(
-      String leadId, String date, String user, String note, context) async {
+  addFollowUp(leadId, String date, String user, String note, context) async {
     log("LeadDetailsController -> addFollowUp()");
     await LeadDetailService.addFollowUp(leadId, date, user, note).then((value) {
       if (value["data"] != null) {
@@ -234,8 +240,7 @@ class LeadDetailsController extends ChangeNotifier {
     });
   }
 
-  reAssign(
-      String leadId, String user, String officeId, BuildContext context) async {
+  reAssign(leadId, String user, String officeId, BuildContext context) async {
     log("LeadDetailsController -> reAssign()");
     try {
       final value = await LeadDetailService.reAssign(leadId, user, officeId);
@@ -265,7 +270,7 @@ class LeadDetailsController extends ChangeNotifier {
     }
   }
 
-  sendMail(String subject, String to, String cc, String body, String leadId,
+  sendMail(String subject, String to, String cc, String body, leadId,
       context) async {
     log("LeadDetailsController -> sendMail()");
     await LeadDetailService.sendMail(subject, to, cc, body, leadId)

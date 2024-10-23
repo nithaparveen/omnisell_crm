@@ -18,7 +18,7 @@ import 'package:provider/provider.dart';
 
 class LeadDetailScreen extends StatefulWidget {
   const LeadDetailScreen({super.key, required this.leadId});
-  final String leadId;
+  final int leadId;
 
   @override
   State<LeadDetailScreen> createState() => _LeadDetailScreenState();
@@ -116,45 +116,42 @@ class _LeadDetailScreenState extends State<LeadDetailScreen>
               phone: "${controller.leadDetailModel.data?.phoneNumber ?? 'N/A'}",
             ),
             LeadStatusCard(
-              percentageComplete:
-                  controller.leadDetailModel.data?.stage?.progressPercentage ??
-                      0,
-              leadStatus:
-                  controller.leadDetailModel.data?.stage?.description ?? "",
-              currentStage: '${controller.leadDetailModel.data?.stage?.name}',
-              leadId: "${controller.leadDetailModel.data?.id}",
-            ),
+                percentageComplete: controller
+                        .leadDetailModel.data?.stage?.progressPercentage ??
+                    0,
+                leadStatus:
+                    controller.leadDetailModel.data?.stage?.description ?? "",
+                currentStage: '${controller.leadDetailModel.data?.stage?.name}',
+                leadId: controller.leadDetailModel.data?.id ?? 0),
             buildSectionTitle(
                 Icons.messenger_outline_rounded, "Communication Status", size),
             CommunicationCard(
-              emailSend:
-                  "${controller.communicationSummaryModel.data?.emailSendSummary}",
-              emailReceiveSummary:
-                  "${controller.communicationSummaryModel.data?.emailReceiveSummary}",
-              phoneInbound:
-                  "${controller.phoneSummaryModel.data?.callsInbound}",
-              phoneOutbound:
-                  "${controller.phoneSummaryModel.data?.callsOutbound}",
-              leadId: "${controller.leadDetailModel.data?.id}",
-            ),
+                emailSend:
+                    "${controller.communicationSummaryModel.data?.emailSendSummary}",
+                emailReceiveSummary:
+                    "${controller.communicationSummaryModel.data?.emailReceiveSummary}",
+                phoneInbound:
+                    "${controller.phoneSummaryModel.data?.callsInbound}",
+                phoneOutbound:
+                    "${controller.phoneSummaryModel.data?.callsOutbound}",
+                leadId: controller.leadDetailModel.data?.id ?? 0),
             buildSectionTitle(Icons.calendar_today_outlined,
                 "Upcoming Task & Follow-ups", size),
             TaskCard(
-              latestTask:
-                  controller.leadDetailModel.data?.latestTask?.dueDate != null
-                      ? formatDate1(controller
-                          .leadDetailModel.data!.latestTask!.dueDate
-                          .toString())
-                      : "NA",
-              latestFollowUp: controller
-                          .leadDetailModel.data?.latestFollowUp?.followUpDate !=
-                      null
-                  ? formatDate1(controller
-                      .leadDetailModel.data!.latestFollowUp!.followUpDate
-                      .toString())
-                  : "NA",
-              leadId: "${controller.leadDetailModel.data?.id}",
-            ),
+                latestTask:
+                    controller.leadDetailModel.data?.latestTask?.dueDate != null
+                        ? formatDate1(controller
+                            .leadDetailModel.data!.latestTask!.dueDate
+                            .toString())
+                        : "NA",
+                latestFollowUp: controller.leadDetailModel.data?.latestFollowUp
+                            ?.followUpDate !=
+                        null
+                    ? formatDate1(controller
+                        .leadDetailModel.data!.latestFollowUp!.followUpDate
+                        .toString())
+                    : "NA",
+                leadId: controller.leadDetailModel.data?.id ?? 0),
             buildSectionTitle(Icons.share_outlined, "Lead Source", size),
             LeadSourceCard(
               leadSource:
@@ -163,10 +160,9 @@ class _LeadDetailScreenState extends State<LeadDetailScreen>
             buildSectionTitle(
                 Icons.person_add_outlined, "Assigned Salesperson", size),
             AssignCard(
-              assignTo:
-                  controller.leadDetailModel.data?.assignedTo?.name ?? "NA",
-              leadId: "${controller.leadDetailModel.data?.id}",
-            ),
+                assignTo:
+                    controller.leadDetailModel.data?.assignedTo?.name ?? "NA",
+                leadId: controller.leadDetailModel.data?.id ?? 0),
           ],
         ),
       );

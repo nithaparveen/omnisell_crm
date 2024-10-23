@@ -14,12 +14,12 @@ class CommunicationController extends ChangeNotifier {
   bool isCallLoading = false;
   CallModel callModel = CallModel();
 
-  Future<void> fetchEmailData(String leadId, BuildContext context) async {
+  Future<void> fetchEmailData( leadId, BuildContext context) async {
     isEmailLoading = true;
     emailModel = EmailModel();
     notifyListeners();
 
-    final value = await CommunicationService.fetchEmailData(leadId);
+    final value = await CommunicationService.fetchEmailData(leadId.toString());
     if (value?["data"] != null) {
       emailModel = EmailModel.fromJson(value!);
     } else {
@@ -33,12 +33,12 @@ class CommunicationController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchWhatsAppData(String leadId, BuildContext context) async {
+  Future<void> fetchWhatsAppData(leadId, BuildContext context) async {
     isWhatsAppLoading = true;
     whatsappModel = WhatsAppModel();
     notifyListeners();
 
-    final value = await CommunicationService.fetchWhatsAppData(leadId);
+    final value = await CommunicationService.fetchWhatsAppData(leadId.toString());
     if (value?["data"] != null) {
       whatsappModel = WhatsAppModel.fromJson(value!);
     } else {
@@ -52,12 +52,12 @@ class CommunicationController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchCallData(String leadId, BuildContext context) async {
+  Future<void> fetchCallData(leadId, BuildContext context) async {
     isCallLoading = true;
     callModel = CallModel();
     notifyListeners();
 
-    final value = await CommunicationService.fetchCallData(leadId);
+    final value = await CommunicationService.fetchCallData(leadId.toString());
     if (value?["data"] != null) {
       callModel = CallModel.fromJson(value!);
     } else {
@@ -71,9 +71,9 @@ class CommunicationController extends ChangeNotifier {
     notifyListeners();
   }
 
-   sendWhatsapp(String message, String to,  String leadId,
+   sendWhatsapp(String message, String to,  leadId,
       context) async {
-    await CommunicationService.sendWhatsapp(message, to, leadId)
+    await CommunicationService.sendWhatsapp(message, to, leadId.toString())
         .then((value) {
       if (value["data"] != null) {
         // AppUtils.oneTimeSnackBar(value["message"], context: context,textStyle: TextStyle(fontSize: 18));

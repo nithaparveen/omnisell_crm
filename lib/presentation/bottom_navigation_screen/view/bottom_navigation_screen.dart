@@ -1,8 +1,11 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:omnisell_crm/presentation/task_manager_screen/view/task_manager_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_clipped_nav_bar/sliding_clipped_nav_bar.dart';
 import '../../lead_screen/view/lead_screen.dart';
 import '../controller/bottom_navigation_controller.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class BottomNavBar extends StatefulWidget {
   const BottomNavBar({super.key});
@@ -12,11 +15,22 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
+  Future<void> enableNotifications() async {
+    try {
+      await OneSignal.User.pushSubscription.optIn();
+    } catch (e) {
+      log('Error enabling notifications: $e');
+    }
+  }
+
   @override
   void initState() {
-    Provider.of<BottomNavigationController>(context, listen: false)
-        .selectedIndex = 0;
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<BottomNavigationController>(context, listen: false)
+          .selectedIndex = 0;
+      enableNotifications();
+    });
   }
 
   @override
@@ -29,8 +43,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             index: provider.selectedIndex,
             children: const [
               LeadScreen(),
-              LeadScreen(),
-              LeadScreen(),
+              TaskManagerScreen(),
             ],
           );
         },
@@ -47,15 +60,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
               BarItem(
                 icon: Icons.dashboard_outlined,
                 title: 'Leads',
-                
               ),
               BarItem(
-                icon: Icons.dashboard_outlined,
-                title: 'Leads',
-              ),
-              BarItem(
-                icon: Icons.dashboard_outlined,
-                title: 'Leads',
+                icon: Icons.task_alt,
+                title: 'Tasks',
               ),
             ],
             activeColor: Colors.blue,

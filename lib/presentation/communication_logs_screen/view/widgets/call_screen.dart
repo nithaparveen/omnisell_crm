@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 class CallScreen extends StatefulWidget {
   const CallScreen({super.key, required this.leadId});
-  final String leadId;
+  final int leadId;
 
   @override
   State<CallScreen> createState() => _CallScreenState();

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:omnisell_crm/core/constants/colors.dart';
+import 'package:omnisell_crm/core/utils/app_utils.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
 import 'package:provider/provider.dart';
 
 class AssignCard extends StatelessWidget {
   final String assignTo;
-  final String leadId;
+  final int leadId;
 
   const AssignCard({
     super.key,
@@ -66,7 +66,7 @@ class AssignCard extends StatelessWidget {
 }
 
 class ReAssignBottomSheet extends StatefulWidget {
-  final String leadId;
+  final int leadId;
 
   const ReAssignBottomSheet({
     super.key,
@@ -224,6 +224,11 @@ class ReAssignBottomSheetState extends State<ReAssignBottomSheet> {
                           .reAssign(widget.leadId, selectedUserId ?? '',
                               selectedOfficeId ?? '', context);
                       Navigator.of(context).pop();
+                        AppUtils.showFlushbar(
+                      context: context,
+                      message: "Lead assigned successfully",
+                    backgroundColor: const Color.fromARGB(255, 244, 244, 244),
+                      icon: Icons.done);
                       Provider.of<LeadDetailsController>(context, listen: false)
                           .fetchData(widget.leadId, context);
                       Provider.of<LeadDetailsController>(context, listen: false)

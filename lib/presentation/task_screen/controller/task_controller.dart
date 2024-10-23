@@ -9,22 +9,24 @@ class TaskController extends ChangeNotifier {
   bool isMoreLoading = false;
   TaskModel taskModel = TaskModel();
 
-  Future<void> fetchData(String leadId,BuildContext context) async {
-    isLoading = true;
-    taskModel = TaskModel();
-    notifyListeners();
+  Future<void> fetchData(leadId, BuildContext context) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      isLoading = true;
+      taskModel = TaskModel();
+      notifyListeners();
 
-    final value = await TaskService.fetchData(leadId);
-    if (value?["data"] != null) {
-      taskModel = TaskModel.fromJson(value!);
-    } else {
-      AppUtils.oneTimeSnackBar(
-        "Unable to fetch Data",
-        context: context,
-        bgColor: ColorTheme.red,
-      );
-    }
-    isLoading = false;
-    notifyListeners();
+      final value = await TaskService.fetchData(leadId.toString());
+      if (value?["data"] != null) {
+        taskModel = TaskModel.fromJson(value!);
+      } else {
+        AppUtils.oneTimeSnackBar(
+          "Unable to fetch Data",
+          context: context,
+          bgColor: ColorTheme.red,
+        );
+      }
+      isLoading = false;
+      notifyListeners();
+    });
   }
 }

@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 class WhatsAppScreen extends StatefulWidget {
   const WhatsAppScreen({super.key, required this.leadId});
-  final String leadId;
+  final int leadId;
 
   @override
   State<WhatsAppScreen> createState() => _WhatsAppScreenState();

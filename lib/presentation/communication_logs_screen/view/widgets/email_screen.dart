@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 class EmailScreen extends StatefulWidget {
   const EmailScreen({super.key, required this.leadId});
-  final String leadId;
+  final int leadId;
 
   @override
   State<EmailScreen> createState() => _EmailScreenState();

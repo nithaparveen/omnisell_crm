@@ -1,11 +1,11 @@
 import '../../../../core/utils/app_utils.dart';
 import '../../../helper/api_helper.dart';
 
-class LeadsService {
+class TaskMangerService {
   static Future<Map<String, dynamic>?> fetchData({required int page}) async {
     try {
       var decodedData = await ApiHelper.getData(
-        endPoint: "leads?page=$page",
+        endPoint: "tasks?page=$page",
         header: ApiHelper.getApiHeader(access: await AppUtils.getToken()),
       );
       return decodedData is Map<String, dynamic> ? decodedData : null;

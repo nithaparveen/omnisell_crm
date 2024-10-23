@@ -9,12 +9,12 @@ class FollowUpController extends ChangeNotifier {
   bool isMoreLoading = false;
   FollowUpModel followUpModel = FollowUpModel();
 
-  Future<void> fetchData(String leadId,BuildContext context) async {
+  Future<void> fetchData(leadId,BuildContext context) async {
     isLoading = true;
     followUpModel = FollowUpModel();
     notifyListeners();
 
-    final value = await FollowUpService.fetchData(leadId);
+    final value = await FollowUpService.fetchData(leadId.toString());
     if (value?["data"] != null) {
       followUpModel = FollowUpModel.fromJson(value!);
     } else {

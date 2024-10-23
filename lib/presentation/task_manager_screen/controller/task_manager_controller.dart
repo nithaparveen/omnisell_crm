@@ -1,33 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:omnisell_crm/core/constants/colors.dart';
 import 'package:omnisell_crm/core/utils/app_utils.dart';
-import 'package:omnisell_crm/repository/api/timeline_screen/model/timeline_model.dart';
-import 'package:omnisell_crm/repository/api/timeline_screen/service/timeline_service.dart';
+import 'package:omnisell_crm/repository/api/task_manager_screen/model/task_manager_model.dart';
+import 'package:omnisell_crm/repository/api/task_manager_screen/service/task_manager_service.dart';
 
-class TImeLineController extends ChangeNotifier {
+class TaskManagerController extends ChangeNotifier {
   bool isLoading = false;
   bool isMoreLoading = false;
-  TimeLineModel timeLineModel = TimeLineModel();
+  int currentPage = 1;
+  TaskManagerModel taskManagerModel = TaskManagerModel();
 
-  Future<void> fetchData( leadId,BuildContext context) async {
-    isLoading = true;
-    timeLineModel = TimeLineModel();
-    notifyListeners();
+  Future<void> fetchData(BuildContext context) async {
+      isLoading = true;
+      currentPage = 1;
+      taskManagerModel = TaskManagerModel();
+      notifyListeners();
 
-    final value = await TimeLineService.fetchData(leadId.toString());
-    if (value?["data"] != null) {
-      timeLineModel = TimeLineModel.fromJson(value!);
-    } else {
-      AppUtils.oneTimeSnackBar(
-        "Unable to fetch Data",
-        context: context,
-        bgColor: ColorTheme.red,
-      );
-    }
-    isLoading = false;
-    notifyListeners();
+      final value = await TaskMangerService.fetchData(page: currentPage);
+      if (value?["data"] != null) {
+        taskManagerModel = TaskManagerModel.fromJson(value!);
+      } else {
+        AppUtils.oneTimeSnackBar(
+          "Unable to fetch Data",
+          context: context,
+          bgColor: ColorTheme.red,
+        );
+      }
+      isLoading = false;
+      notifyListeners();
   }
-}
+
   // Future<void> fetchMoreProjects(BuildContext context) async {
   //   if (isMoreLoading) return;
   //   isMoreLoading = true;
@@ -38,7 +40,7 @@ class TImeLineController extends ChangeNotifier {
   //     final value = await LeadsService.fetchData(page: currentPage);
   //     if (value != null && value["status"] == "success") {
   //       final moreProjects = LeadsModel.fromJson(value);
-  //       timeLineModel.data?.addAll(moreProjects.data ?? []);
+  //       leadsModel.data?.addAll(moreProjects.data ?? []);
   //     } else {
   //       AppUtils.oneTimeSnackBar(
   //         "Unable to fetch more data",
@@ -53,4 +55,4 @@ class TImeLineController extends ChangeNotifier {
   //     notifyListeners();
   //   }
   // }
-
+}

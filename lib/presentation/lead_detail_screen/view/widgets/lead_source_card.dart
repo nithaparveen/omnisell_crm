@@ -23,8 +23,8 @@ class LeadSourceCard extends StatelessWidget {
           child: Text(
             leadSource,
             style: const TextStyle(
-              fontSize: 16, // Adjust size as needed
-              fontWeight: FontWeight.w500, // Adjust weight as needed
+              fontSize: 16, 
+              fontWeight: FontWeight.w500, 
             ),
           ),
         ),

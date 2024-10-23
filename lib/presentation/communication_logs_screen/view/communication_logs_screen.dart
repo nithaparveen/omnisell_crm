@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_crm/core/constants/textstyles.dart';
+import 'package:omnisell_crm/core/utils/app_utils.dart';
 import 'package:omnisell_crm/custom_icons_icons.dart';
 import 'package:omnisell_crm/presentation/communication_logs_screen/controller/communication_controller.dart';
 import 'package:omnisell_crm/presentation/communication_logs_screen/view/widgets/call_screen.dart';
@@ -11,7 +12,7 @@ import 'package:provider/provider.dart';
 
 class CommunicationLogsScreen extends StatefulWidget {
   const CommunicationLogsScreen({super.key, required this.leadId});
-  final String leadId;
+  final int leadId;
 
   @override
   State<CommunicationLogsScreen> createState() =>
@@ -263,7 +264,7 @@ class _CommunicationLogsScreenState extends State<CommunicationLogsScreen> {
 }
 
 class MailBottomSheet extends StatefulWidget {
-  final String leadId;
+  final int leadId;
 
   const MailBottomSheet({
     super.key,
@@ -280,7 +281,7 @@ class MailBottomSheetState extends State<MailBottomSheet> {
   TextEditingController bodyController = TextEditingController();
   TextEditingController bodyFooterController = TextEditingController();
 
-  bool isTemplateSelected = false; // Track if the template is selected
+  bool isTemplateSelected = false;
 
   @override
   void initState() {
@@ -324,7 +325,6 @@ class MailBottomSheetState extends State<MailBottomSheet> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Row for template selection
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -337,8 +337,8 @@ class MailBottomSheetState extends State<MailBottomSheet> {
                       onPressed: fillThankYouTemplate,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: isTemplateSelected
-                            ? Colors.green // Color when selected
-                            : const Color(0xFF353967), // Default color
+                            ? Colors.green
+                            : const Color(0xFF353967),
                       ),
                       child: const Text(
                         'Thank You',
@@ -362,8 +362,6 @@ class MailBottomSheetState extends State<MailBottomSheet> {
                   readOnly: true,
                 ),
                 const SizedBox(height: 10),
-
-                // 'CC' field
                 TextField(
                   controller: ccController,
                   decoration: InputDecoration(
@@ -374,8 +372,6 @@ class MailBottomSheetState extends State<MailBottomSheet> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
-                // 'Subject' field
                 TextField(
                   controller: subjectController,
                   decoration: InputDecoration(
@@ -386,8 +382,6 @@ class MailBottomSheetState extends State<MailBottomSheet> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
-                // 'Body' field
                 const Text('Body'),
                 TextField(
                   controller: bodyController,
@@ -399,8 +393,6 @@ class MailBottomSheetState extends State<MailBottomSheet> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Buttons for sending or canceling
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -424,22 +416,40 @@ class MailBottomSheetState extends State<MailBottomSheet> {
                             MaterialStatePropertyAll(Color(0xFF353967)),
                       ),
                       onPressed: () {
-                        Provider.of<LeadDetailsController>(context,
-                                listen: false)
-                            .sendMail(
-                                subjectController.text,
-                                toController.text,
-                                ccController.text,
-                                bodyController.text,
-                                widget.leadId,
-                                context);
-                        Navigator.of(context).pop();
+                        if (subjectController.text.isEmpty ||
+                            toController.text.isEmpty ||
+                            bodyController.text.isEmpty) {
+                          AppUtils.showFlushbar(
+                              context: context,
+                              message: "Please fill in all required fields",
+                              backgroundColor:
+                                  const Color.fromARGB(255, 255, 0, 0),
+                                  iconColor: Colors.white,
+                              icon: Icons.error);
+                        } else {
+                          Provider.of<LeadDetailsController>(context,
+                                  listen: false)
+                              .sendMail(
+                                  subjectController.text,
+                                  toController.text,
+                                  ccController.text,
+                                  bodyController.text,
+                                  widget.leadId,
+                                  context);
+                          Navigator.of(context).pop();
+                          AppUtils.showFlushbar(
+                              context: context,
+                              message: "Mail sent successfully",
+                              backgroundColor:
+                                  const Color.fromARGB(255, 244, 244, 244),
+                              icon: Icons.done);
+                        }
                       },
                       child: const Text(
                         'Send',
                         style: TextStyle(color: Colors.white),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ],
@@ -452,7 +462,7 @@ class MailBottomSheetState extends State<MailBottomSheet> {
 }
 
 class WhatsappBottomSheet extends StatefulWidget {
-  final String leadId;
+  final int leadId;
 
   const WhatsappBottomSheet({
     super.key,
@@ -485,7 +495,7 @@ class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
   void fillWhatsappTemplate() {
     setState(() {
       messageController.text = 'Hello,\n\n'
-          'Thank you for reaching out to Fasttrack Emarat. We’ve received your message, '
+          'Thank you for reaching out to Fasttrack Emarat. We’ve received your message,'
           'and one of our representatives will get in touch with you as soon as possible.\n\n'
           'For immediate assistance, feel free to contact us at 800fasttrack.\n\n'
           'Best regards,\n'
@@ -533,8 +543,6 @@ class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
                   ],
                 ),
                 const SizedBox(height: 10),
-
-                // 'To' field
                 TextField(
                   controller: toController,
                   decoration: InputDecoration(
@@ -546,8 +554,6 @@ class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
-                // 'Message' field
                 TextField(
                   controller: messageController,
                   maxLines: 4,
@@ -559,8 +565,6 @@ class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Send and Cancel Buttons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -584,11 +588,35 @@ class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
                             MaterialStatePropertyAll(Color(0xFF353967)),
                       ),
                       onPressed: () {
-                        Provider.of<CommunicationController>(context,
-                                listen: false)
-                            .sendWhatsapp(messageController.text,
-                                toController.text, widget.leadId, context);
-                        Navigator.of(context).pop();
+                        if (messageController.text.isEmpty ||
+                            toController.text.isEmpty) {
+                          AppUtils.showFlushbar(
+                            context: context,
+                            message:
+                                "Please fill in both the message and recipient fields",
+                            backgroundColor: const Color.fromARGB(
+                                255, 255, 0, 0),
+                            icon: Icons.error,
+                            iconColor: Colors.white
+                          );
+                        } else {
+                          Provider.of<CommunicationController>(context,
+                                  listen: false)
+                              .sendWhatsapp(
+                            messageController.text,
+                            toController.text,
+                            widget.leadId,
+                            context,
+                          );
+                          Navigator.of(context).pop();
+                          AppUtils.showFlushbar(
+                            context: context,
+                            message: "WhatsApp message sent successfully",
+                            backgroundColor:
+                                const Color.fromARGB(255, 244, 244, 244),
+                            icon: Icons.done,
+                          );
+                        }
                       },
                       child: const Text(
                         'Send',
@@ -607,7 +635,7 @@ class WhatsappBottomSheetState extends State<WhatsappBottomSheet> {
 }
 
 class CalLogBottomSheet extends StatefulWidget {
-  final String leadId;
+  final int leadId;
 
   const CalLogBottomSheet({
     super.key,
@@ -628,7 +656,6 @@ class CalLogBottomSheetState extends State<CalLogBottomSheet> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Dismiss keyboard when tapping outside the text fields
         FocusScope.of(context).unfocus();
       },
       child: Padding(
@@ -636,7 +663,6 @@ class CalLogBottomSheetState extends State<CalLogBottomSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Phone Type Dropdown
             DropdownButtonFormField<String>(
               value: selectedPhoneType,
               hint: const Text('Select Type'),
@@ -658,8 +684,6 @@ class CalLogBottomSheetState extends State<CalLogBottomSheet> {
               }).toList(),
             ),
             const SizedBox(height: 16),
-
-            // Date and Time Picker
             TextFormField(
               controller: _dateTimeController,
               readOnly: true,
@@ -685,7 +709,6 @@ class CalLogBottomSheetState extends State<CalLogBottomSheet> {
                   );
 
                   if (selectedTime != null) {
-                    // Combine date and time into a DateTime object
                     DateTime combinedDateTime = DateTime(
                       selectedDate.year,
                       selectedDate.month,
@@ -693,8 +716,6 @@ class CalLogBottomSheetState extends State<CalLogBottomSheet> {
                       selectedTime.hour,
                       selectedTime.minute,
                     );
-
-                    // Format the DateTime object
                     String formattedDateTime = DateFormat('yyyy-MM-dd hh:mm:ss')
                         .format(combinedDateTime);
 
@@ -706,7 +727,6 @@ class CalLogBottomSheetState extends State<CalLogBottomSheet> {
               },
             ),
             const SizedBox(height: 16),
-            // Call Summary Field
             TextFormField(
               controller: _callSummaryController,
               decoration: InputDecoration(
@@ -717,14 +737,11 @@ class CalLogBottomSheetState extends State<CalLogBottomSheet> {
               ),
             ),
             const SizedBox(height: 16),
-
-            // Action Buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Cancel button logic
                     Navigator.of(context).pop();
                   },
                   style: ElevatedButton.styleFrom(
@@ -746,14 +763,34 @@ class CalLogBottomSheetState extends State<CalLogBottomSheet> {
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () {
-                    Provider.of<LeadDetailsController>(context, listen: false)
-                        .addCallLog(
-                            widget.leadId,
-                            selectedPhoneType!,
-                            _dateTimeController.text,
-                            _callSummaryController.text,
-                            context);
-                    Navigator.of(context).pop();
+                    if (selectedPhoneType == null ||
+                        _dateTimeController.text.isEmpty ||
+                        _callSummaryController.text.isEmpty) {
+                      AppUtils.showFlushbar(
+                        context: context,
+                        message: "Please fill in all the fields",
+                        backgroundColor: const Color.fromARGB(255, 255, 0, 0),
+                        icon: Icons.error,
+                        iconColor: Colors.white
+                      );
+                    } else {
+                      Provider.of<LeadDetailsController>(context, listen: false)
+                          .addCallLog(
+                        widget.leadId,
+                        selectedPhoneType!,
+                        _dateTimeController.text,
+                        _callSummaryController.text,
+                        context,
+                      );
+                      Navigator.of(context).pop();
+                      AppUtils.showFlushbar(
+                        context: context,
+                        message: "Call log saved successfully",
+                        backgroundColor:
+                            const Color.fromARGB(255, 244, 244, 244),
+                        icon: Icons.done,
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF353967),

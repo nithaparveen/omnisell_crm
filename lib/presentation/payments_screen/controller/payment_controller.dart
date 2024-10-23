@@ -9,22 +9,24 @@ class PaymentController extends ChangeNotifier {
   bool isMoreLoading = false;
   PaymentModel paymentModel = PaymentModel();
 
-  Future<void> fetchData(String leadId,BuildContext context) async {
-    isLoading = true;
-    paymentModel = PaymentModel();
-    notifyListeners();
+  Future<void> fetchData(leadId, BuildContext context) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      isLoading = true;
+      paymentModel = PaymentModel();
+      notifyListeners();
 
-    final value = await PaymentService.fetchData(leadId);
-    if (value?["data"] != null) {
-      paymentModel = PaymentModel.fromJson(value!);
-    } else {
-      AppUtils.oneTimeSnackBar(
-        "Unable to fetch Data",
-        context: context,
-        bgColor: ColorTheme.red,
-      );
-    }
-    isLoading = false;
-    notifyListeners();
-  }
+      final value = await PaymentService.fetchData(leadId.toString());
+      if (value?["data"] != null) {
+        paymentModel = PaymentModel.fromJson(value!);
+      } else {
+        AppUtils.oneTimeSnackBar(
+          "Unable to fetch Data",
+          context: context,
+          bgColor: ColorTheme.red,
+        );
+      }
+      isLoading = false;
+      notifyListeners();
+    });
+  } 
 }

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:omnisell_crm/global_widgets/shimmer_effect.dart';
 import 'package:omnisell_crm/app_config/app_config.dart';
@@ -22,11 +21,14 @@ class _LeadScreenState extends State<LeadScreen> {
 
   @override
   void initState() {
-    fetchData();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      fetchData();
+    });
+
     super.initState();
   }
 
-  void fetchData() async {
+  Future<void> fetchData() async {
     setState(() {
       isLoading = true;
     });
@@ -49,16 +51,9 @@ class _LeadScreenState extends State<LeadScreen> {
           style: GLTextStyles.cabinStyle(
               color: Colors.black, size: 22, weight: FontWeight.w800),
         ),
+        automaticallyImplyLeading: false,
+        forceMaterialTransparency: true,
         actions: [
-          IconButton(
-            onPressed: fetchData,
-            tooltip: "Refresh",
-            icon: const Icon(
-              CupertinoIcons.refresh_circled,
-              size: 24,
-              color: Colors.black,
-            ),
-          ),
           IconButton(
             icon: const Icon(
               Icons.logout_outlined,
@@ -68,122 +63,133 @@ class _LeadScreenState extends State<LeadScreen> {
             onPressed: () => logoutConfirmation(),
           ),
         ],
-        automaticallyImplyLeading: false,
-        forceMaterialTransparency: true,
       ),
       body: SafeArea(
         child: Consumer<LeadsController>(builder: (context, controller, _) {
           return isLoading
               ? ShimmerEffect(size: size)
-              : Padding(
-                  padding: const EdgeInsets.only(left: 15, right: 15),
-                  child: CustomScrollView(
-                    slivers: [
-                      SliverList.separated(
-                        itemCount: controller.leadsModel.data?.length ?? 0,
-                        itemBuilder: (context, index) {
-                          return InkWell(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LeadDetailScreen(
-                                    leadId:
-                                        "${controller.leadsModel.data?[index].id ?? 0}"),
-                              ),
-                            ),
-                            child: Card(
-                              surfaceTintColor: Colors.white,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 20, right: 20, top: 10, bottom: 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Column(
-                                          children: [
-                                            Text(
-                                              "Lead Id : ${controller.leadsModel.data?[index].leadUniqueId}",
-                                              style: GLTextStyles.cabinStyle(
-                                                  size: 13,
-                                                  weight: FontWeight.w400,
-                                                  color: Colors.blueAccent),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            Text(
-                                              "${controller.leadsModel.data?[index].name}",
-                                              style: GLTextStyles.cabinStyle(
-                                                  size: 16,
-                                                  weight: FontWeight.w600,
-                                                  color: Colors.black),
-                                            )
-                                          ],
-                                        ),
-                                        Container(
-                                          decoration: BoxDecoration(
-                                              color: Colors.blueAccent,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(.2),
-                                                  blurRadius: 10,
-                                                  offset: const Offset(0, 5),
-                                                )
-                                              ]),
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 3,
-                                                bottom: 3,
-                                                right: 8,
-                                                left: 8),
-                                            child: Text(
-                                              "${controller.leadsModel.data?[index].stage?.name}",
-                                              style: GLTextStyles.cabinStyle(
-                                                  size: 13,
-                                                  weight: FontWeight.w400,
-                                                  color: Colors.white),
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    const Divider(thickness: 0.5),
-                                    if (controller.leadsModel.data?[index]
-                                            .phoneNumber !=
-                                        null)
-                                      iconTextRow(CustomIcons.phone_1,
-                                          "${controller.leadsModel.data?[index].phoneNumber}"),
-                                    if (controller.leadsModel.data?[index]
-                                            .whatsappNumber !=
-                                        null)
-                                      iconTextRow(CustomIcons.whatsapp,
-                                          "${controller.leadsModel.data?[index].whatsappNumber}"),
-                                    if (controller
-                                            .leadsModel.data?[index].city !=
-                                        null)
-                                      iconTextRow(Icons.pin_drop_rounded,
-                                          "${controller.leadsModel.data?[index].city}"),
-                                    if (controller.leadsModel.data?[index]
-                                            .assignedToOffice?.name !=
-                                        null)
-                                      iconTextRow(CustomIcons.building,
-                                          "${controller.leadsModel.data?[index].assignedToOffice?.name}"),
-                                  ],
+              : RefreshIndicator(
+                  color: Colors.blueAccent,
+                  onRefresh: fetchData,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 15, right: 15),
+                    child: CustomScrollView(
+                      slivers: [
+                        SliverList.separated(
+                          itemCount: controller.leadsModel.data?.length ?? 0,
+                          itemBuilder: (context, index) {
+                            return InkWell(
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LeadDetailScreen(
+                                      leadId: controller
+                                              .leadsModel.data?[index].id ??
+                                          0),
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                        separatorBuilder: (context, index) => const SizedBox(
-                          height: 5,
-                        ),
-                      )
-                    ],
+                              child: Card(
+                                surfaceTintColor: Colors.white,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 20, right: 20, top: 10, bottom: 10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Lead Id : ${controller.leadsModel.data?[index].leadUniqueId}",
+                                                style: GLTextStyles.cabinStyle(
+                                                    size: 13,
+                                                    weight: FontWeight.w400,
+                                                    color: Colors.blueAccent),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              Text(
+                                                "${controller.leadsModel.data?[index].name}",
+                                                style: GLTextStyles.cabinStyle(
+                                                    size: 16,
+                                                    weight: FontWeight.w600,
+                                                    color: Colors.black),
+                                              )
+                                            ],
+                                          ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                                color: Colors.blueAccent,
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(.2),
+                                                    blurRadius: 10,
+                                                    offset: const Offset(0, 5),
+                                                  )
+                                                ]),
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 3,
+                                                  bottom: 3,
+                                                  right: 8,
+                                                  left: 8),
+                                              child: Text(
+                                                "${controller.leadsModel.data?[index].stage?.name}",
+                                                style: GLTextStyles.cabinStyle(
+                                                    size: 13,
+                                                    weight: FontWeight.w400,
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      const Divider(thickness: 0.5),
+                                      if (controller.leadsModel.data?[index]
+                                              .phoneNumber !=
+                                          null)
+                                        iconTextRow(CustomIcons.phone_1,
+                                            "${controller.leadsModel.data?[index].phoneNumber}"),
+                                      if (controller.leadsModel.data?[index]
+                                              .whatsappNumber !=
+                                          null)
+                                        iconTextRow(CustomIcons.whatsapp,
+                                            "${controller.leadsModel.data?[index].whatsappNumber}"),
+                                      if (controller
+                                              .leadsModel.data?[index].city !=
+                                          null)
+                                        iconTextRow(Icons.pin_drop_rounded,
+                                            "${controller.leadsModel.data?[index].city}"),
+                                      if (controller.leadsModel.data?[index]
+                                              .assignedToOffice?.name !=
+                                          null)
+                                        iconTextRow(CustomIcons.building,
+                                            "${controller.leadsModel.data?[index].assignedToOffice?.name}"),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          separatorBuilder: (context, index) => const SizedBox(
+                            height: 5,
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 );
         }),
@@ -240,8 +246,6 @@ class _LeadScreenState extends State<LeadScreen> {
           content: const Text('Are you sure you want to log out?'),
           actions: [
             TextButton(
-              style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(Colors.white)),
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 'Cancel',
@@ -253,9 +257,6 @@ class _LeadScreenState extends State<LeadScreen> {
               ),
             ),
             TextButton(
-              style: const ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll(Color(0xff468585)),
-              ),
               onPressed: () {
                 Navigator.of(context).pop();
                 logout(context);

@@ -11,23 +11,23 @@ class LeadsController extends ChangeNotifier {
   LeadsModel leadsModel = LeadsModel();
 
   Future<void> fetchData(BuildContext context) async {
-    isLoading = true;
-    currentPage = 1;
-    leadsModel = LeadsModel();
-    notifyListeners();
+      isLoading = true;
+      currentPage = 1;
+      leadsModel = LeadsModel();
+      notifyListeners();
 
-    final value = await LeadsService.fetchData(page: currentPage);
-    if (value?["data"] != null) {
-      leadsModel = LeadsModel.fromJson(value!);
-    } else {
-      AppUtils.oneTimeSnackBar(
-        "Unable to fetch Data",
-        context: context,
-        bgColor: ColorTheme.red,
-      );
-    }
-    isLoading = false;
-    notifyListeners();
+      final value = await LeadsService.fetchData(page: currentPage);
+      if (value?["data"] != null) {
+        leadsModel = LeadsModel.fromJson(value!);
+      } else {
+        AppUtils.oneTimeSnackBar(
+          "Unable to fetch Data",
+          context: context,
+          bgColor: ColorTheme.red,
+        );
+      }
+      isLoading = false;
+      notifyListeners();
   }
 
   Future<void> fetchMoreProjects(BuildContext context) async {

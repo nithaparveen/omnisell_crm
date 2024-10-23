@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:timelines_plus/timelines_plus.dart';
 
 class FollowUpScreen extends StatefulWidget {
-  final String leadId;
+  final int leadId;
 
   const FollowUpScreen({super.key, required this.leadId});
 

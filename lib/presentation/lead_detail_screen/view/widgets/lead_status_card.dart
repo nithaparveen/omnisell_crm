@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:omnisell_crm/core/constants/textstyles.dart';
+import 'package:omnisell_crm/core/utils/app_utils.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +11,7 @@ class LeadStatusCard extends StatelessWidget {
   final int percentageComplete;
   final String leadStatus;
   final String currentStage;
-  final String leadId;
+  final int leadId;
 
   const LeadStatusCard({
     super.key,
@@ -163,7 +164,7 @@ class LeadStatusCard extends StatelessWidget {
 }
 
 class StatusChangeBottomSheet extends StatefulWidget {
-  final String leadId;
+  final int leadId;
   final String currentStage;
 
   const StatusChangeBottomSheet({
@@ -254,6 +255,11 @@ class StatusChangeBottomSheetState extends State<StatusChangeBottomSheet> {
                     Provider.of<LeadDetailsController>(context, listen: false)
                         .changeStage(widget.leadId, selectedStageId, context);
                   });
+                  AppUtils.showFlushbar(
+                      context: context,
+                      message: "Lead stage changed successfully",
+                      backgroundColor: const Color.fromARGB(255, 244, 244, 244),
+                      icon: Icons.done);
                   Provider.of<LeadDetailsController>(context, listen: false)
                       .fetchData(widget.leadId, context);
                   Provider.of<LeadDetailsController>(context, listen: false)

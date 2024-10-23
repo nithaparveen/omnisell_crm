@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:timelines_plus/timelines_plus.dart';
 
 class TimeLineScreen extends StatefulWidget {
-  final String leadId; // Pass the leadId to fetch data
+  final int leadId; 
 
   const TimeLineScreen({super.key, required this.leadId});
 

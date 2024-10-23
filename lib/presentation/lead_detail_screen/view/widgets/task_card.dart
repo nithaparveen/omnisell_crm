@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:omnisell_crm/core/constants/textstyles.dart';
+import 'package:omnisell_crm/core/utils/app_utils.dart';
 import 'package:omnisell_crm/presentation/lead_detail_screen/controller/lead_detail_controller.dart';
 import 'package:provider/provider.dart';
 
 class TaskCard extends StatelessWidget {
   final String latestTask;
   final String latestFollowUp;
-  final String leadId;
+  final int leadId;
 
   const TaskCard({
     super.key,
@@ -128,7 +129,7 @@ class TaskCard extends StatelessWidget {
 }
 
 class AddTaskBottomSheet extends StatefulWidget {
-  final String leadId;
+  final int leadId;
 
   const AddTaskBottomSheet({
     super.key,
@@ -294,15 +295,39 @@ class AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                   const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: () {
-                      Provider.of<LeadDetailsController>(context, listen: false)
-                          .addTask(
-                              titileController.text,
-                              dateController.text,
-                              selectedUserId ?? '',
-                              widget.leadId,
-                              descriptionController.text,
-                              context);
-                      Navigator.of(context).pop();
+                      if (titileController.text.isEmpty ||
+                          dateController.text.isEmpty ||
+                          selectedUserId == null ||
+                          descriptionController.text.isEmpty) {
+                        AppUtils.showFlushbar(
+                          context: context,
+                          message: "Please fill in all the fields",
+                          backgroundColor: const Color.fromARGB(
+                              255, 255, 0, 0),
+                          icon: Icons.error,
+                          iconColor: Colors.white
+                        );
+                      } else {
+                        Provider.of<LeadDetailsController>(context,
+                                listen: false)
+                            .addTask(
+                          titileController.text,
+                          dateController.text,
+                          selectedUserId ??
+                              '', 
+                          widget.leadId,
+                          descriptionController.text,
+                          context,
+                        );
+                        Navigator.of(context).pop();
+                        AppUtils.showFlushbar(
+                          context: context,
+                          message: "Task added successfully",
+                          backgroundColor:
+                              const Color.fromARGB(255, 244, 244, 244),
+                          icon: Icons.done,
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF353967),
@@ -331,7 +356,7 @@ class AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
 }
 
 class FollowUpBottomSheet extends StatefulWidget {
-  final String leadId;
+  final int leadId;
 
   const FollowUpBottomSheet({
     super.key,
@@ -459,14 +484,34 @@ class FollowUpBottomSheetState extends State<FollowUpBottomSheet> {
                   const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: () {
-                      Provider.of<LeadDetailsController>(context, listen: false)
-                          .addFollowUp(
-                              widget.leadId,
-                              dateController.text,
-                              selectedUserId ?? '',
-                              noteController.text,
-                              context);
-                      Navigator.of(context).pop();
+                      if (dateController.text.isEmpty ||
+                          selectedUserId == null ||
+                          noteController.text.isEmpty) {
+                        AppUtils.showFlushbar(
+                          context: context,
+                          message: "Please fill in all the fields",
+                          backgroundColor: const Color.fromARGB(255, 255, 0, 0),
+                          icon: Icons.error,
+                          iconColor: Colors.white
+                        );
+                      } else {
+                        Provider.of<LeadDetailsController>(context,
+                                listen: false)
+                            .addFollowUp(
+                          widget.leadId,
+                          dateController.text,
+                          selectedUserId ?? '',
+                          noteController.text,
+                          context,
+                        );
+                        Navigator.of(context).pop();
+                        AppUtils.showFlushbar(
+                          context: context,
+                          message: "Follow-Up added successfully",
+                          backgroundColor: Color.fromARGB(255, 240, 240, 240),
+                          icon: Icons.done,
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF353967),
