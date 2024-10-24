@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:omnisell_crm/global_widgets/shimmer_effect.dart';
 import 'package:omnisell_crm/app_config/app_config.dart';
 import 'package:omnisell_crm/core/constants/textstyles.dart';
@@ -17,15 +18,33 @@ class LeadScreen extends StatefulWidget {
 }
 
 class _LeadScreenState extends State<LeadScreen> {
+  final ScrollController _scrollController = ScrollController();
   bool isLoading = true;
 
   @override
   void initState() {
+    super.initState();
+    _scrollController.addListener(_scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       fetchData();
     });
+  }
 
-    super.initState();
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      final controller = Provider.of<LeadsController>(context, listen: false);
+      if (!controller.isMoreLoading && !controller.hasReachedMax) {
+        controller.fetchMoreData(context);
+      }
+    }
   }
 
   Future<void> fetchData() async {
@@ -49,7 +68,7 @@ class _LeadScreenState extends State<LeadScreen> {
         title: Text(
           "Lead Screen",
           style: GLTextStyles.cabinStyle(
-              color: Colors.black, size: 22, weight: FontWeight.w800),
+              color: Colors.black, size: 20, weight: FontWeight.w800),
         ),
         automaticallyImplyLeading: false,
         forceMaterialTransparency: true,
@@ -74,126 +93,151 @@ class _LeadScreenState extends State<LeadScreen> {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 15, right: 15),
                     child: CustomScrollView(
+                      controller: _scrollController,
                       slivers: [
-                        SliverList.separated(
-                          itemCount: controller.leadsModel.data?.length ?? 0,
-                          itemBuilder: (context, index) {
-                            return InkWell(
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => LeadDetailScreen(
-                                      leadId: controller
-                                              .leadsModel.data?[index].id ??
-                                          0),
-                                ),
-                              ),
-                              child: Card(
-                                surfaceTintColor: Colors.white,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 20, right: 20, top: 10, bottom: 10),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Lead Id : ${controller.leadsModel.data?[index].leadUniqueId}",
-                                                style: GLTextStyles.cabinStyle(
-                                                    size: 13,
-                                                    weight: FontWeight.w400,
-                                                    color: Colors.blueAccent),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              Text(
-                                                "${controller.leadsModel.data?[index].name}",
-                                                style: GLTextStyles.cabinStyle(
-                                                    size: 16,
-                                                    weight: FontWeight.w600,
-                                                    color: Colors.black),
-                                              )
-                                            ],
-                                          ),
-                                          Container(
-                                            decoration: BoxDecoration(
-                                                color: Colors.blueAccent,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black
-                                                        .withOpacity(.2),
-                                                    blurRadius: 10,
-                                                    offset: const Offset(0, 5),
-                                                  )
-                                                ]),
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 3,
-                                                  bottom: 3,
-                                                  right: 8,
-                                                  left: 8),
-                                              child: Text(
-                                                "${controller.leadsModel.data?[index].stage?.name}",
-                                                style: GLTextStyles.cabinStyle(
-                                                    size: 13,
-                                                    weight: FontWeight.w400,
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      const Divider(thickness: 0.5),
-                                      if (controller.leadsModel.data?[index]
-                                              .phoneNumber !=
-                                          null)
-                                        iconTextRow(CustomIcons.phone_1,
-                                            "${controller.leadsModel.data?[index].phoneNumber}"),
-                                      if (controller.leadsModel.data?[index]
-                                              .whatsappNumber !=
-                                          null)
-                                        iconTextRow(CustomIcons.whatsapp,
-                                            "${controller.leadsModel.data?[index].whatsappNumber}"),
-                                      if (controller
-                                              .leadsModel.data?[index].city !=
-                                          null)
-                                        iconTextRow(Icons.pin_drop_rounded,
-                                            "${controller.leadsModel.data?[index].city}"),
-                                      if (controller.leadsModel.data?[index]
-                                              .assignedToOffice?.name !=
-                                          null)
-                                        iconTextRow(CustomIcons.building,
-                                            "${controller.leadsModel.data?[index].assignedToOffice?.name}"),
-                                    ],
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              if (index <
+                                  (controller.leadsModel.data?.length ?? 0)) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 5),
+                                  child: buildLeadCard(controller, index),
+                                );
+                              } else if (controller.isMoreLoading) {
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                  child: Center(
+                                    child: LoadingAnimationWidget
+                                        .horizontalRotatingDots(
+                                      color: Colors.blueAccent,
+                                      size: 32,
+                                    ),
                                   ),
-                                ),
-                              ),
-                            );
-                          },
-                          separatorBuilder: (context, index) => const SizedBox(
-                            height: 5,
+                                );
+                              } else if (controller.hasReachedMax) {
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                  child: Center(
+                                    child: Text('No more leads to load',
+                                        style: GLTextStyles.cabinStyle(
+                                            size: 15,
+                                            weight: FontWeight.w400,
+                                            color: Colors.black)),
+                                  ),
+                                );
+                              }
+                              return null;
+                            },
+                            childCount:
+                                (controller.leadsModel.data?.length ?? 0) +
+                                    (controller.hasReachedMax ? 1 : 1),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
                 );
         }),
       ),
+    );
+  }
+
+  Widget buildLeadCard(LeadsController controller, int index) {
+    return InkWell(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LeadDetailScreen(
+              leadId: controller.leadsModel.data?[index].id ?? 0),
+        ),
+      ),
+      child: Card(
+        surfaceTintColor: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Lead Id : ${controller.leadsModel.data?[index].leadUniqueId}",
+                        style: GLTextStyles.cabinStyle(
+                            size: 13,
+                            weight: FontWeight.w400,
+                            color: Colors.blueAccent),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        "${controller.leadsModel.data?[index].name}",
+                        style: GLTextStyles.cabinStyle(
+                            size: 16,
+                            weight: FontWeight.w600,
+                            color: Colors.black),
+                      )
+                    ],
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blueAccent,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(.2),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        )
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      child: Text(
+                        "${controller.leadsModel.data?[index].stage?.name}",
+                        style: GLTextStyles.cabinStyle(
+                            size: 13,
+                            weight: FontWeight.w400,
+                            color: Colors.white),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              const Divider(thickness: 0.5),
+              buildContactInfo(controller, index),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildContactInfo(LeadsController controller, int index) {
+    return Column(
+      children: [
+        if (controller.leadsModel.data?[index].phoneNumber != null)
+          iconTextRow(CustomIcons.phone_1,
+              "${controller.leadsModel.data?[index].phoneNumber}"),
+        if (controller.leadsModel.data?[index].whatsappNumber != null)
+          iconTextRow(CustomIcons.whatsapp,
+              "${controller.leadsModel.data?[index].whatsappNumber}"),
+        if (controller.leadsModel.data?[index].city != null)
+          iconTextRow(Icons.pin_drop_rounded,
+              "${controller.leadsModel.data?[index].city}"),
+        if (controller.leadsModel.data?[index].assignedToOffice?.name != null)
+          iconTextRow(CustomIcons.building,
+              "${controller.leadsModel.data?[index].assignedToOffice?.name}"),
+      ],
     );
   }
 

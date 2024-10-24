@@ -20,11 +20,32 @@ class TaskManagerScreen extends StatefulWidget {
 }
 
 class _TaskManagerScreenState extends State<TaskManagerScreen> {
+  final ScrollController _scrollController = ScrollController();
   bool isLoading = true;
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      final controller =
+          Provider.of<TaskManagerController>(context, listen: false);
+      if (!controller.isMoreLoading && !controller.hasReachedMax) {
+        controller.fetchMoreData(context);
+      }
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_scrollListener);
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       fetchData();
     });
@@ -51,7 +72,7 @@ class _TaskManagerScreenState extends State<TaskManagerScreen> {
         title: Text(
           "Task Manager Screen",
           style: GLTextStyles.cabinStyle(
-              color: Colors.black, size: 22, weight: FontWeight.w800),
+              color: Colors.black, size: 20, weight: FontWeight.w800),
         ),
         actions: [
           InkWell(
@@ -110,166 +131,210 @@ class _TaskManagerScreenState extends State<TaskManagerScreen> {
         child: isLoading
             ? ShimmerEffect(size: size)
             : RefreshIndicator(
-              color: Colors.blueAccent,
+                color: Colors.blueAccent,
                 onRefresh: fetchData,
                 child: Consumer<TaskManagerController>(
                   builder: (context, controller, _) {
                     return Padding(
                       padding: const EdgeInsets.only(left: 15, right: 15),
                       child: CustomScrollView(
+                        controller: _scrollController,
                         slivers: [
-                          SliverList.separated(
-                            itemCount:
-                                controller.taskManagerModel.data?.length ?? 0,
-                            itemBuilder: (context, index) {
-                              return InkWell(
-                                onTap: () => showTaskDetailBottomSheet(
-                                  context,
-                                  title: controller.taskManagerModel
-                                          .data?[index].title ??
-                                      'No Title',
-                                  lead: controller.taskManagerModel.data?[index]
-                                          .lead?.name ??
-                                      'No Lead',
-                                  assignedBy: controller.taskManagerModel
-                                          .data?[index].createdBy?.name ??
-                                      'Unknown',
-                                  dueDate: controller.taskManagerModel
-                                              .data?[index].dueDate !=
-                                          null
-                                      ? DateFormat('dd-MM-yyyy').format(
-                                          controller.taskManagerModel
-                                              .data![index].dueDate!)
-                                      : 'No Due Date',
-                                  createdBy: controller.taskManagerModel
-                                          .data?[index].createdBy?.name ??
-                                      'Unknown',
-                                  assignedTo: controller.taskManagerModel
-                                          .data?[index].assignedToUser?.name ??
-                                      'Unknown',
-                                  createdDate: controller.taskManagerModel
-                                              .data?[index].createdAt !=
-                                          null
-                                      ? DateFormat('dd-MM-yyyy').format(
-                                          controller.taskManagerModel
-                                              .data![index].createdAt!)
-                                      : 'No Date',
-                                ),
-                                child: Card(
-                                  surfaceTintColor: Colors.white,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 10,
-                                        bottom: 10),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
+                          SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                if (index <
+                                    (controller.taskManagerModel.data?.length ??
+                                        0)) {
+                                  return InkWell(
+                                    onTap: () => showTaskDetailBottomSheet(
+                                      context,
+                                      title: controller.taskManagerModel
+                                              .data?[index].title ??
+                                          'No Title',
+                                      lead: controller.taskManagerModel
+                                              .data?[index].lead?.name ??
+                                          'No Lead',
+                                      assignedBy: controller.taskManagerModel
+                                              .data?[index].createdBy?.name ??
+                                          'Unknown',
+                                      dueDate: controller.taskManagerModel
+                                                  .data?[index].dueDate !=
+                                              null
+                                          ? DateFormat('dd-MM-yyyy').format(
+                                              controller.taskManagerModel
+                                                  .data![index].dueDate!)
+                                          : 'No Due Date',
+                                      createdBy: controller.taskManagerModel
+                                              .data?[index].createdBy?.name ??
+                                          'Unknown',
+                                      assignedTo: controller
+                                              .taskManagerModel
+                                              .data?[index]
+                                              .assignedToUser
+                                              ?.name ??
+                                          'Unknown',
+                                      createdDate: controller.taskManagerModel
+                                                  .data?[index].createdAt !=
+                                              null
+                                          ? DateFormat('dd-MM-yyyy').format(
+                                              controller.taskManagerModel
+                                                  .data![index].createdAt!)
+                                          : 'No Date',
+                                    ),
+                                    child: Card(
+                                      surfaceTintColor: Colors.white,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 20,
+                                            right: 20,
+                                            top: 10,
+                                            bottom: 10),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
+                                            Row(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
-                                                Text(
-                                                  "Lead : ${controller.taskManagerModel.data?[index].lead?.name}",
-                                                  style:
-                                                      GLTextStyles.cabinStyle(
-                                                          size: 13,
-                                                          weight:
-                                                              FontWeight.w400,
-                                                          color: Colors
-                                                              .blueAccent),
+                                                Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "Lead : ${controller.taskManagerModel.data?[index].lead?.name}",
+                                                      style: GLTextStyles
+                                                          .cabinStyle(
+                                                              size: 13,
+                                                              weight: FontWeight
+                                                                  .w400,
+                                                              color: Colors
+                                                                  .blueAccent),
+                                                    ),
+                                                    Text(
+                                                      "Due Date : ${controller.taskManagerModel.data?[index].dueDate != null ? DateFormat('dd-MM-yyyy').format(controller.taskManagerModel.data![index].dueDate!) : 'No Due Date'}",
+                                                      style: GLTextStyles
+                                                          .cabinStyle(
+                                                              size: 12,
+                                                              weight: FontWeight
+                                                                  .w400,
+                                                              color:
+                                                                  Colors.black),
+                                                    ),
+                                                    const SizedBox(height: 8),
+                                                    Text(
+                                                      "${controller.taskManagerModel.data?[index].title}",
+                                                      style: GLTextStyles
+                                                          .cabinStyle(
+                                                              size: 16,
+                                                              weight: FontWeight
+                                                                  .w600,
+                                                              color:
+                                                                  Colors.black),
+                                                    )
+                                                  ],
                                                 ),
-                                                Text(
-                                                  "Due Date : ${controller.taskManagerModel.data?[index].dueDate != null ? DateFormat('dd-MM-yyyy').format(controller.taskManagerModel.data![index].dueDate!) : 'No Due Date'}",
-                                                  style:
-                                                      GLTextStyles.cabinStyle(
-                                                          size: 12,
-                                                          weight:
-                                                              FontWeight.w400,
-                                                          color: Colors.black),
-                                                ),
-                                                const SizedBox(height: 8),
-                                                Text(
-                                                  "${controller.taskManagerModel.data?[index].title}",
-                                                  style:
-                                                      GLTextStyles.cabinStyle(
-                                                          size: 16,
-                                                          weight:
-                                                              FontWeight.w600,
-                                                          color: Colors.black),
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.blueAccent,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black
+                                                              .withOpacity(.2),
+                                                          blurRadius: 10,
+                                                          offset: const Offset(
+                                                              0, 5),
+                                                        )
+                                                      ]),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 3,
+                                                            bottom: 3,
+                                                            right: 8,
+                                                            left: 8),
+                                                    child: Text(
+                                                      "${controller.taskManagerModel.data?[index].status}",
+                                                      style: GLTextStyles
+                                                          .cabinStyle(
+                                                              size: 13,
+                                                              weight: FontWeight
+                                                                  .w400,
+                                                              color:
+                                                                  Colors.white),
+                                                    ),
+                                                  ),
                                                 )
                                               ],
                                             ),
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                  color: Colors.blueAccent,
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.black
-                                                          .withOpacity(.2),
-                                                      blurRadius: 10,
-                                                      offset:
-                                                          const Offset(0, 5),
-                                                    )
-                                                  ]),
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 3,
-                                                    bottom: 3,
-                                                    right: 8,
-                                                    left: 8),
-                                                child: Text(
-                                                  "${controller.taskManagerModel.data?[index].status}",
-                                                  style:
-                                                      GLTextStyles.cabinStyle(
-                                                          size: 13,
-                                                          weight:
-                                                              FontWeight.w400,
-                                                          color: Colors.white),
-                                                ),
-                                              ),
-                                            )
+                                            const Divider(thickness: 0.5),
+                                            if (controller
+                                                    .taskManagerModel
+                                                    .data?[index]
+                                                    .assignedToUser
+                                                    ?.name !=
+                                                null)
+                                              richTextRow("Assign To  : ",
+                                                  "${controller.taskManagerModel.data?[index].assignedToUser?.name}"),
+                                            if (controller
+                                                    .taskManagerModel
+                                                    .data?[index]
+                                                    .createdBy
+                                                    ?.name !=
+                                                null)
+                                              richTextRow("Created By  : ",
+                                                  "${controller.taskManagerModel.data?[index].createdBy?.name}"),
                                           ],
                                         ),
-                                        const Divider(thickness: 0.5),
-                                        if (controller
-                                                .taskManagerModel
-                                                .data?[index]
-                                                .assignedToUser
-                                                ?.name !=
-                                            null)
-                                          richTextRow("Assign To  : ",
-                                              "${controller.taskManagerModel.data?[index].assignedToUser?.name}"),
-                                        if (controller.taskManagerModel
-                                                .data?[index].createdBy?.name !=
-                                            null)
-                                          richTextRow("Created By  : ",
-                                              "${controller.taskManagerModel.data?[index].createdBy?.name}"),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              );
-                            },
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(
-                              height: 5,
+                                  );
+                                } else if (controller.isMoreLoading) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
+                                    child: Center(
+                                      child: LoadingAnimationWidget
+                                          .horizontalRotatingDots(
+                                        color: Colors.blueAccent,
+                                        size: 32,
+                                      ),
+                                    ),
+                                  );
+                                } else if (controller.hasReachedMax) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
+                                    child: Center(
+                                      child: Text(
+                                        'No more leads to load',
+                                        style: GLTextStyles.cabinStyle(
+                                            size: 15,
+                                            weight: FontWeight.w400,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return null;
+                              },
+                              childCount:
+                                  (controller.taskManagerModel.data?.length ??
+                                          0) +
+                                      (controller.hasReachedMax ? 1 : 1),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     );
